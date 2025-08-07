@@ -19,6 +19,7 @@ const BrandListService = async () => {
   }
 };
 
+// Service to get the list of categories
 const CategoryListService = async () => {
   try {
     const categories = await CategoryModel.find({});
@@ -28,6 +29,7 @@ const CategoryListService = async () => {
   }
 };
 
+// Service to get the list of product sliders
 const SliderListService = async () => {
   try {
     const sliders = await ProductSliderModel.find({});

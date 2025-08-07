@@ -29,9 +29,33 @@ exports.ProductBrandList = async (req, res) => {
   }
 };
 
-exports.ProductCategoryList = async (req, res) => {};
+// Get the list of categories
+exports.ProductCategoryList = async (req, res) => {
+  try {
+    const result = await CategoryListService();
+    const statusCode = result.status === "success" ? 200 : 500;
+    return res.status(statusCode).json(result);
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
 
-exports.ProductSliderList = async (req, res) => {};
+// Get the list of product sliders
+exports.ProductSliderList = async (req, res) => {
+  try {
+    const result = await SliderListService();
+    const statusCode = result.status === "success" ? 200 : 500;
+    return res.status(statusCode).json(result);
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
 
 exports.ProductListByBrand = async (req, res) => {};
 

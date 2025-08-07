@@ -31,7 +31,6 @@ app.use(xss());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
 // MongoDB Database Connection
 let URI = process.env.MONGODB_URI;
 mongoose
@@ -47,11 +46,11 @@ mongoose
 app.use("/api/v1", router);
 
 // Serve Static Files
-app.use(express.static('client/dist'));
+app.use(express.static("client/dist"));
 
 // Catch-All Route for Single Page Application
-app.get('*', function (req, res) {
-  res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'));
+app.get("*", function (req, res) {
+  res.sendFile(path.resolve(__dirname, "client", "dist", "index.html"));
 });
 
 // Undefined Routes Handling
