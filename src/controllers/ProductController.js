@@ -57,9 +57,32 @@ exports.ProductSliderList = async (req, res) => {
   }
 };
 
-exports.ProductListByBrand = async (req, res) => {};
+// Get the list of products by brand
+exports.ProductListByBrand = async (req, res) => {
+  try {
+    const { BrandID } = req.params;
+    const result = await ListByBrandService(BrandID);
+    const statusCode = result.status === "success" ? 200 : 400;
+    return res.status(statusCode).json(result);
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: error.message });
+  }
+};
 
-exports.ProductListByCategory = async (req, res) => {};
+// Get the list of products by category
+exports.ProductListByCategory = async (req, res) => {
+  try {
+    const categoryId = req.params.CategoryID;
+    const result = await ListByCategoryService(categoryId);
+    const statusCode = result.status === "success" ? 200 : 500;
+    return res.status(statusCode).json(result);
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
 
 exports.ProductListBySimilar = async (req, res) => {};
 
