@@ -162,8 +162,40 @@ const ListBySimilarService = async (categoryID) => {
     return { status: "error", message: e.message };
   }
 };
+// Function to escape special characters in search keywords
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+const ListBySearchService = async (keyword) => {
+  try {
+    if (typeof keyword !== "string" || !keyword.trim()) {
+      return { status: "error", message: "Invalid search keyword" };
+    }
+    const Keyword = keyword.trim();
+    let SearchRegex = new RegExp(escapeRegex(Keyword), "i");
+    let SearchParams = [{ title: SearchRegex }, { shortDes: SearchRegex }];
+    let SearchQuery = { $or: SearchParams };
 
-const ListBySearchService = async () => {};
+    const MatchStage = { $match: SearchQuery };
+    const JoinWithBrandStage = { $lookup: { from: "brands", localField: "brandID", foreignField: "_id", as: "brand" } };
+    const UnwindBrandStage = { $unwind: { path: "$brand" } };
+    const JoinWithCategoryStage = { $lookup: { from: "categories", localField: "categoryID", foreignField: "_id", as: "category" } };
+    const UnwindCategoryStage = { $unwind: { path: "$category" } };
+    const ProjectionStage = { $project: { "brand._id": 0, "category._id": 0, brandID: 0, categoryID: 0 } };
+
+    const data = await ProductModel.aggregate([
+      MatchStage,
+      JoinWithBrandStage,
+      UnwindBrandStage,
+      JoinWithCategoryStage,
+      UnwindCategoryStage,
+      ProjectionStage,
+    ]);
+    return { status: "success", data };
+  } catch (error) {
+    return { status: "error", message: error.message };
+  }
+};
 
 // Service to get product details and reviews
 const DetailsService = async (productID) => {
@@ -198,7 +230,19 @@ const DetailsService = async (productID) => {
   }
 };
 
-const ReviewListService = async () => {};
+const ReviewListService = async (productID) => {
+  try {
+    const ProductID = new Types.ObjectId(productID);
+    const MatchStage = { $match: { productID: ProductID } };
+    const JoinWithProfileStage = { $lookup: { from: "profiles", localField: "userID", foreignField: "userID", as: "profile" } };
+    const UnwindProfileStage = { $unwind: { path: "$profile" } };
+
+    const data = await ReviewModel.aggregate([MatchStage, JoinWithProfileStage, UnwindProfileStage]);
+    return { status: "success", data };
+  } catch (error) {
+    return { status: "error", message: error.message };
+  }
+};
 
 module.exports = {
   BrandListService,

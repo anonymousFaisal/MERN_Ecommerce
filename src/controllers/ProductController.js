@@ -84,7 +84,7 @@ exports.ProductListByRemark = async (req, res) => {
     return res.status(500).json({ status: "error", message: error.message });
   }
 };
-
+// Get the list of products by similar category and search keyword
 exports.ProductListBySimilar = async (req, res) => {
   try {
     const { CategoryID } = req.params;
@@ -95,9 +95,19 @@ exports.ProductListBySimilar = async (req, res) => {
     return res.status(500).json({ status: "error", message: error.message });
   }
 };
+exports.ProductListBySearch = async (req, res) => {
+  try {
+    const { Keyword } = req.params;
+    const result = await ListBySearchService(Keyword);
+    const statusCode = result.status === "success" ? 200 : 400;
+    return res.status(statusCode).json(result);
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: error.message });
+  }
+};
 
-exports.ProductListBySearch = async (req, res) => {};
 
+// Get product details and reviews
 exports.ProductDetails = async (req, res) => {
   try {
     const { ProductID } = req.params;
@@ -108,7 +118,13 @@ exports.ProductDetails = async (req, res) => {
     return res.status(500).json({ status: "error", message: error.message });
   }
 };
-
-exports.ProductReviewList = async (req, res) => {};
-
-exports.ProductReviewList = async (req, res) => {};
+exports.ProductReviewList = async (req, res) => {
+  try {
+    const { ProductID } = req.params;
+    const result = await ReviewListService(ProductID);
+    const statusCode = result.status === "success" ? 200 : 400;
+    return res.status(statusCode).json(result);
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: error.message });
+  }
+};
