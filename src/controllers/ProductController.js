@@ -15,7 +15,7 @@ const {
 // These functions handle incoming requests, call the appropriate service functions,
 // and return structured responses to the client
 
-// Get the list of brands
+// Get the list of brands, categories, and product sliders
 exports.ProductBrandList = async (req, res) => {
   try {
     const result = await BrandListService();
@@ -28,8 +28,6 @@ exports.ProductBrandList = async (req, res) => {
     });
   }
 };
-
-// Get the list of categories
 exports.ProductCategoryList = async (req, res) => {
   try {
     const result = await CategoryListService();
@@ -42,8 +40,6 @@ exports.ProductCategoryList = async (req, res) => {
     });
   }
 };
-
-// Get the list of product sliders
 exports.ProductSliderList = async (req, res) => {
   try {
     const result = await SliderListService();
@@ -57,7 +53,7 @@ exports.ProductSliderList = async (req, res) => {
   }
 };
 
-// Get the list of products by brand
+// Get the list of products by brand, category, and remarks
 exports.ProductListByBrand = async (req, res) => {
   try {
     const { BrandID } = req.params;
@@ -68,27 +64,30 @@ exports.ProductListByBrand = async (req, res) => {
     return res.status(500).json({ status: "error", message: error.message });
   }
 };
-
-// Get the list of products by category
 exports.ProductListByCategory = async (req, res) => {
   try {
-    const categoryId = req.params.CategoryID;
-    const result = await ListByCategoryService(categoryId);
-    const statusCode = result.status === "success" ? 200 : 500;
+    const { CategoryID } = req.params;
+    const result = await ListByCategoryService(CategoryID);
+    const statusCode = result.status === "success" ? 200 : 400;
     return res.status(statusCode).json(result);
   } catch (error) {
-    return res.status(500).json({
-      status: "error",
-      message: error.message,
-    });
+    return res.status(500).json({ status: "error", message: error.message });
+  }
+};
+exports.ProductListByRemark = async (req, res) => {
+  try {
+    const { Remark } = req.params;
+    const result = await ListByRemarkService(Remark);
+    const statusCode = result.status === "success" ? 200 : 400;
+    return res.status(statusCode).json(result);
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: error.message });
   }
 };
 
 exports.ProductListBySimilar = async (req, res) => {};
 
 exports.ProductListBySearch = async (req, res) => {};
-
-exports.ProductListByRemark = async (req, res) => {};
 
 exports.ProductDetails = async (req, res) => {};
 
