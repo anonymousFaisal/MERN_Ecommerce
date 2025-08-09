@@ -8,7 +8,7 @@ router.get("/ProductCategoryList", ProductController.ProductCategoryList);
 router.get("/ProductSliderList", ProductController.ProductSliderList);
 router.get("/ProductListByBrand/:BrandID", ProductController.ProductListByBrand);
 router.get("/ProductListByCategory/:CategoryID", ProductController.ProductListByCategory);
-router.get("/ProductListBySimilar/:Keyword", ProductController.ProductListBySimilar);
+router.get("/ProductListBySimilar/:CategoryID", ProductController.ProductListBySimilar);
 router.get("/ProductListBySearch/:Keyword", ProductController.ProductListBySearch);
 router.get("/ProductListByRemark/:Remark", ProductController.ProductListByRemark);
 router.get("/ProductDetails/:ProductID", ProductController.ProductDetails);

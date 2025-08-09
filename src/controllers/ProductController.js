@@ -85,11 +85,29 @@ exports.ProductListByRemark = async (req, res) => {
   }
 };
 
-exports.ProductListBySimilar = async (req, res) => {};
+exports.ProductListBySimilar = async (req, res) => {
+  try {
+    const { CategoryID } = req.params;
+    const result = await ListBySimilarService(CategoryID);
+    const statusCode = result.status === "success" ? 200 : 400;
+    return res.status(statusCode).json(result);
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: error.message });
+  }
+};
 
 exports.ProductListBySearch = async (req, res) => {};
 
-exports.ProductDetails = async (req, res) => {};
+exports.ProductDetails = async (req, res) => {
+  try {
+    const { ProductID } = req.params;
+    const result = await DetailsService(ProductID);
+    const statusCode = result.status === "success" ? 200 : 400;
+    return res.status(statusCode).json(result);
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: error.message });
+  }
+};
 
 exports.ProductReviewList = async (req, res) => {};
 
