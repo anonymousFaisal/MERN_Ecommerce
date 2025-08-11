@@ -1,5 +1,6 @@
 const express = require("express");
 const ProductController = require("../controllers/ProductController");
+const UserController = require("../controllers/UserController");
 const router = express.Router();
 
 // Product Routes
@@ -16,6 +17,7 @@ router.get("/ProductReviewList/:ProductID", ProductController.ProductReviewList)
 
 
 // User Routes
-
+router.get("/UserOTP/:email", UserController.UserOTP);
+router.get("/VerifyOTP/:email/:otp", UserController.VerifyOTP);
 
 module.exports = router;
