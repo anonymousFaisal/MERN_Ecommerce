@@ -14,4 +14,8 @@ router.get("/ProductListByRemark/:Remark", ProductController.ProductListByRemark
 router.get("/ProductDetails/:ProductID", ProductController.ProductDetails);
 router.get("/ProductReviewList/:ProductID", ProductController.ProductReviewList);
 
+
+// User Routes
+
+
 module.exports = router;

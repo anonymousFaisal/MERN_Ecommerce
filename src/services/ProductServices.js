@@ -236,8 +236,15 @@ const ReviewListService = async (productID) => {
     const MatchStage = { $match: { productID: ProductID } };
     const JoinWithProfileStage = { $lookup: { from: "profiles", localField: "userID", foreignField: "userID", as: "profile" } };
     const UnwindProfileStage = { $unwind: { path: "$profile" } };
+    const ProjectionStage = {
+      $project: {
+        des: 1,
+        rating: 1,
+        "profile.cus_name": 1,
+      },
+    };
 
-    const data = await ReviewModel.aggregate([MatchStage, JoinWithProfileStage, UnwindProfileStage]);
+    const data = await ReviewModel.aggregate([MatchStage, JoinWithProfileStage, UnwindProfileStage, ProjectionStage]);
     return { status: "success", data };
   } catch (error) {
     return { status: "error", message: error.message };
