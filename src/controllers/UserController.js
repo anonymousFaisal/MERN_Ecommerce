@@ -1,4 +1,4 @@
-const { UserOTPService, VerifyOTPService } = require("../services/UserServices");
+const { UserOTPService, VerifyOTPService, SaveProfileService, ReadProfileService } = require("../services/UserServices");
 
 exports.UserOTP = async (req, res) => {
   try {
@@ -24,7 +24,7 @@ exports.VerifyOTP = async (req, res) => {
       // Cookies Option
       let cookieOption = {
         expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day
-        httpOnly: false // set true for security
+        httpOnly: false, // set true for security
       };
 
       // Set Cookie with token
@@ -38,11 +38,51 @@ exports.VerifyOTP = async (req, res) => {
   }
 };
 
+exports.UserLogout = async (req, res) => {
+  try {
+    const cookieOption = {
+      expires: new Date(Date.now() - 24 * 60 * 60 * 1000), // past date
+      httpOnly: false, // set true for security
+    };
+    res.cookie("token", "", cookieOption);
 
-exports.UserLogout = async (req, res) => {};
+    return res.status(200).json({ status: "success", message: "Logged out successfully" });
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: error.message });
+  }
+};
 
-exports.CreateProfile = async (req, res) => {};
+exports.CreateProfile = async (req, res) => {
+  try {
+    const userID = req.user?.id;
+    if (!userID) {
+      return res.status(401).json({ status: "fail", message: "Unauthorized" });
+    }
 
-exports.UpdateProfile = async (req, res) => {};
+    // Put trusted fields last so they cannot be overridden
+    const payload = { ...req.body, userID };
 
-exports.ReadProfile = async (req, res) => {};
+    const result = await SaveProfileService(payload);
+    const code = result.status === "success" ? 200 : 400;
+    return res.status(code).json(result);
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
+exports.UpdateProfile = exports.CreateProfile; // same behavior (upsert)
+
+exports.ReadProfile = async (req, res) => {
+  try {
+    const userID = req.user?.id;
+    if (!userID) {
+      return res.status(401).json({ status: "fail", message: "Unauthorized" });
+    }
+
+    const result = await ReadProfileService(userID);
+    const code = result.status === "success" ? 200 : 400;
+    return res.status(code).json(result);
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: error.message });
+  }
+};

@@ -12,6 +12,7 @@ const mongoSanitize = require("express-mongo-sanitize");
 const hpp = require("hpp");
 const path = require("path");
 const { xss } = require("express-xss-sanitizer");
+const cookieParser = require("cookie-parser");
 
 // Database Import
 const mongoose = require("mongoose");
@@ -30,6 +31,7 @@ app.use(xss());
 // Body Parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // MongoDB Database Connection
 let URI = process.env.MONGODB_URI;

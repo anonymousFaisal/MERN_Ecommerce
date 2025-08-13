@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const { EmailSent } = require("../utility/EmailHelper");
 const UserModel = require("../models/UserModel");
+const ProfileModel = require("../models/ProfileModel");
 const { EncodeToken } = require("../utility/TokenHelper");
 const { Types } = mongoose;
 
@@ -42,19 +43,32 @@ const VerifyOTPService = async ({ email, otp }) => {
   }
 };
 
-const UserLogoutService = async () => {};
+const SaveProfileService = async ({ userID, ...editable }) => {
+  try {
+    const result = await ProfileModel.updateOne({ userID }, { $set: editable, $setOnInsert: { userID } }, { upsert: true, runValidators: true });
 
-const CreateProfileService = async () => {};
+    let message = "No changes made";
+    if (result.upsertedId) message = "Profile created successfully";
+    else if (result.modifiedCount > 0) message = "Profile updated successfully";
 
-const UpdateProfileService = async () => {};
+    return { status: "success", message };
+  } catch (error) {
+    return { status: "error", message: error.message };
+  }
+};
 
-const ReadProfileService = async () => {};
+const ReadProfileService = async (userID) => {
+  try {
+    const profile = await ProfileModel.findOne({ userID }).lean().exec();
+    return { status: "success", profile };
+  } catch (error) {
+    return { status: "error", message: error.message };
+  }
+};
 
 module.exports = {
   UserOTPService,
   VerifyOTPService,
-  UserLogoutService,
-  CreateProfileService,
-  UpdateProfileService,
+  SaveProfileService,
   ReadProfileService,
 };
