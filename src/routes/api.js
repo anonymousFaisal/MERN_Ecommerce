@@ -2,6 +2,7 @@ const express = require("express");
 const ProductController = require("../controllers/ProductController");
 const UserController = require("../controllers/UserController");
 const WishListController = require("../controllers/WishListController");
+const CartListController = require("../controllers/CartListController");
 const AuthVerification = require("../middlewares/AuthVerification");
 const router = express.Router();
 
@@ -30,6 +31,10 @@ router.get("/Wishlist", AuthVerification, WishListController.Wishlist);
 router.post("/SaveWishlist", AuthVerification, WishListController.SaveWishList);
 router.post("/RemoveWishlist", AuthVerification, WishListController.RemoveWishList);
 
-
+// CartList Routes
+router.get("/CartList", AuthVerification, CartListController.CartList);
+router.post("/SaveCartList", AuthVerification, CartListController.SaveCartList);
+router.post("/UpdateCartList/:cartID", AuthVerification, CartListController.UpdateCartList);
+router.post("/RemoveCartList", AuthVerification, CartListController.RemoveCartList);
 
 module.exports = router;

@@ -13,7 +13,7 @@ const cartSchema = new mongoose.Schema(
       required: true,
     },
     color: { type: String, required: true },
-    price: { type: String, required: true },
+    price: { type: String, required: false },
     qty: { type: String, required: true },
     size: { type: String, required: true },
   },
