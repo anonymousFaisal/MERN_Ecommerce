@@ -58,7 +58,7 @@ const WishListService = async (user_ID) => {
   }
 };
 
-const AddWishListService = async ({ userID, productID }) => {
+const SaveWishListService = async ({ userID, productID }) => {
   try {
     const result = await WishModel.updateOne({ userID, productID }, { $setOnInsert: { userID, productID } }, { upsert: true, runValidators: true });
     let message = "No changes made";
@@ -88,6 +88,6 @@ const RemoveWishListService = async ({ userID, productID }) => {
 
 module.exports = {
   WishListService,
-  AddWishListService,
+  SaveWishListService,
   RemoveWishListService,
 };

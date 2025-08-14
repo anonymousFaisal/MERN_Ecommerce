@@ -27,7 +27,7 @@ router.get("/ReadProfile", AuthVerification, UserController.ReadProfile);
 
 // WishList Routes
 router.get("/Wishlist", AuthVerification, WishListController.Wishlist);
-router.post("/AddWishlist", AuthVerification, WishListController.AddWishList);
+router.post("/SaveWishlist", AuthVerification, WishListController.SaveWishList);
 router.post("/RemoveWishlist", AuthVerification, WishListController.RemoveWishList);
 
 
