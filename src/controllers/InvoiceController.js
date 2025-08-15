@@ -68,6 +68,31 @@ exports.PaymentIPN = async (req, res) => {
   }
 };
 
-exports.InvoiceList = async (req, res) => {};
+exports.InvoiceList = async (req, res) => {
+  try {
+    const userID = req.user?.id;
+    if (!userID) {
+      return res.status(401).json({ status: "fail", message: "Unauthorized" });
+    }
+    const result = await InvoiceListService(userID);
+    const code = result.status === "success" ? 200 : 400;
+    return res.status(code).json(result);
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: error.message });
+  }
+};
 
-exports.InvoiceProductList = async (req, res) => {};
+exports.InvoiceProductList = async (req, res) => {
+  try {
+    const user_ID = req.user?.id;
+    if (!user_ID) {
+      return res.status(401).json({ status: "fail", message: "Unauthorized" });
+    }
+    const invoice_ID = req.params.invoiceID;
+    const result = await InvoiceProductListService(user_ID, invoice_ID);
+    const code = result.status === "success" ? 200 : 400;
+    return res.status(code).json(result);
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: error.message });
+  }
+};

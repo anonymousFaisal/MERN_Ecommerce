@@ -41,8 +41,8 @@ router.post("/RemoveCartList", AuthVerification, CartListController.RemoveCartLi
 // Invoice and Payment Routes
 router.post("/CreateInvoice", AuthVerification, InvoiceController.CreateInvoice);
 
-//router.get("/InvoiceList", AuthVerification, InvoiceController.InvoiceList);
-//router.get("/InvoiceProductList/:InvoiceID", AuthVerification, InvoiceController.InvoiceProductList);
+router.get("/InvoiceList", AuthVerification, InvoiceController.InvoiceList);
+router.get("/InvoiceProductList/:invoiceID", AuthVerification, InvoiceController.InvoiceProductList);
 
 router.post("/PaymentSuccess/:trxID", InvoiceController.PaymentSuccess);
 router.post("/PaymentFail/:trxID", InvoiceController.PaymentFail);

@@ -196,9 +196,28 @@ const PaymentIPNService = async (trxID, sslStatus) => {
   }
 };
 
-const InvoiceListService = async () => {};
+const InvoiceListService = async (userID) => {
+  try {
+    const invoice = await InvoiceModel.find({ userID });
+    return { status: "success", data: invoice };
+  } catch (error) {
+    return { status: "error", message: error.message };
+  }
+};
 
-const InvoiceProductListService = async () => {};
+const InvoiceProductListService = async (user_ID, invoice_ID) => {
+  try {
+    let userID = new Types.ObjectId(user_ID);
+    let invoiceID = new Types.ObjectId(invoice_ID);
+    let matchStage = { $match: { userID, invoiceID } };
+    let joinProductStage = { $lookup: { from: "products", localField: "productID", foreignField: "_id", as: "product" } };
+    let unwindProductStage = { $unwind: { path: "$product" } };
+    const data = await InvoiceProductModel.aggregate([matchStage, joinProductStage, unwindProductStage]);
+    return { status: "success" , data };
+  } catch (error) {
+    return { status: "error", message: error.message };
+  }
+};
 
 module.exports = {
   CreateInvoiceService,
