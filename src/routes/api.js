@@ -44,9 +44,9 @@ router.post("/CreateInvoice", AuthVerification, InvoiceController.CreateInvoice)
 //router.get("/InvoiceList", AuthVerification, InvoiceController.InvoiceList);
 //router.get("/InvoiceProductList/:InvoiceID", AuthVerification, InvoiceController.InvoiceProductList);
 
-//router.post("/PaymentSuccess", AuthVerification, InvoiceController.PaymentSuccess);
-//router.post("/PaymentFail", AuthVerification, InvoiceController.PaymentFail);
-//router.post("/PaymentCancel", AuthVerification, InvoiceController.PaymentCancel);
-//router.post("/PaymentIPN", AuthVerification, InvoiceController.PaymentIPN);
+router.post("/PaymentSuccess/:trxID", InvoiceController.PaymentSuccess);
+router.post("/PaymentFail/:trxID", InvoiceController.PaymentFail);
+router.post("/PaymentCancel/:trxID", InvoiceController.PaymentCancel);
+router.post("/PaymentIPN/:trxID", InvoiceController.PaymentIPN);
 
 module.exports = router;

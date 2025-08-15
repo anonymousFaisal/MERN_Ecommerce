@@ -121,10 +121,10 @@ const CreateInvoiceService = async ({ user_ID, email }) => {
     form.append("total_amount", payable.toString());
     form.append("currency", PaymentSettings[0].currency);
     form.append("tran_id", tran_id);
-    form.append("success_url", PaymentSettings[0].success_url);
-    form.append("fail_url", PaymentSettings[0].fail_url);
-    form.append("cancel_url", PaymentSettings[0].cancel_url);
-    form.append("ipn_url", PaymentSettings[0].ipn_url);
+    form.append("success_url", `${PaymentSettings[0].success_url}/${tran_id}`);
+    form.append("fail_url", `${PaymentSettings[0].fail_url}/${tran_id}`);
+    form.append("cancel_url", `${PaymentSettings[0].cancel_url}/${tran_id}`);
+    form.append("ipn_url", `${PaymentSettings[0].ipn_url}/${tran_id}`);
 
     // customer details
     form.append("cus_name", profile.cus_name);
@@ -160,13 +160,41 @@ const CreateInvoiceService = async ({ user_ID, email }) => {
   }
 };
 
-const PaymentFailService = async () => {};
+const PaymentSuccessService = async (trxID) => {
+  try {
+    const payment = await InvoiceModel.findOneAndUpdate({ tran_id: trxID }, { payment_status: "success" });
+    return { status: "success" };
+  } catch (error) {
+    return { status: "error", message: error.message };
+  }
+};
 
-const PaymentCancelService = async () => {};
+const PaymentFailService = async (trxID) => {
+  try {
+    const payment = await InvoiceModel.findOneAndUpdate({ tran_id: trxID }, { payment_status: "failed" });
+    return { status: "success" };
+  } catch (error) {
+    return { status: "error", message: error.message };
+  }
+};
 
-const PaymentIPNService = async () => {};
+const PaymentCancelService = async (trxID) => {
+  try {
+    const payment = await InvoiceModel.findOneAndUpdate({ tran_id: trxID }, { payment_status: "cancel" });
+    return { status: "success" };
+  } catch (error) {
+    return { status: "error", message: error.message };
+  }
+};
 
-const PaymentSuccessService = async () => {};
+const PaymentIPNService = async (trxID, sslStatus) => {
+  try {
+    const payment = await InvoiceModel.findOneAndUpdate({ tran_id: trxID }, { payment_status: sslStatus });
+    return { status: "success" };
+  } catch (error) {
+    return { status: "error", message: error.message };
+  }
+};
 
 const InvoiceListService = async () => {};
 
