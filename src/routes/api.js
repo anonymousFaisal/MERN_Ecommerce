@@ -4,6 +4,7 @@ const UserController = require("../controllers/UserController");
 const WishListController = require("../controllers/WishListController");
 const CartListController = require("../controllers/CartListController");
 const InvoiceController = require("../controllers/InvoiceController");
+const FeatureController = require("../controllers/FeatureController");
 const AuthVerification = require("../middlewares/AuthVerification");
 const router = express.Router();
 
@@ -48,5 +49,9 @@ router.post("/PaymentSuccess/:trxID", InvoiceController.PaymentSuccess);
 router.post("/PaymentFail/:trxID", InvoiceController.PaymentFail);
 router.post("/PaymentCancel/:trxID", InvoiceController.PaymentCancel);
 router.post("/PaymentIPN/:trxID", InvoiceController.PaymentIPN);
+
+
+// Feature Routes
+router.get("/FeatureList", FeatureController.FeatureList);
 
 module.exports = router;
