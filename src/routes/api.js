@@ -51,7 +51,6 @@ router.post("/PaymentFail/:trxID", InvoiceController.PaymentFail);
 router.post("/PaymentCancel/:trxID", InvoiceController.PaymentCancel);
 router.post("/PaymentIPN/:trxID", InvoiceController.PaymentIPN);
 
-
 // Feature Routes
 router.get("/FeatureList", FeatureController.FeatureList);
 
