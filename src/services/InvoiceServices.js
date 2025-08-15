@@ -9,15 +9,19 @@ const FormData = require("form-data");
 const axios = require("axios");
 const crypto = require("crypto");
 
+// Function to round to 2 decimal places
+const round2 = (n) => Number(Math.round((Number(n) + Number.EPSILON) * 100) / 100);
+
 const CreateInvoiceService = async ({ user_ID, email }) => {
   try {
     if (!Types.ObjectId.isValid(user_ID)) {
       return { status: "error", message: "Invalid user id" };
     }
     const userID = new Types.ObjectId(user_ID);
-    // ===========1. Calculate Total Payable and Vat ===============
-    let matchStage = { $match: { userID } };
-    let joinProductStage = {
+
+    // =========== 1. Calculate Total Payable and Vat ===============
+    const matchStage = { $match: { userID } };
+    const joinProductStage = {
       $lookup: {
         from: "products",
         localField: "productID",
@@ -25,11 +29,14 @@ const CreateInvoiceService = async ({ user_ID, email }) => {
         as: "product",
       },
     };
-    let unwindProductStage = { $unwind: { path: "$product" } };
-    let cartProducts = await CartModel.aggregate([matchStage, joinProductStage, unwindProductStage]);
+    const unwindProductStage = { $unwind: { path: "$product" } };
+
+    const cartProducts = await CartModel.aggregate([matchStage, joinProductStage, unwindProductStage]);
+
     if (cartProducts.length === 0) {
       return { status: "error", message: "Cart is empty" };
     }
+
     // Compute Totals
     let totalAmount = 0;
     cartProducts.forEach((element) => {
@@ -39,26 +46,27 @@ const CreateInvoiceService = async ({ user_ID, email }) => {
 
     let vat = totalAmount * 0.05; // 5% vat
     let payable = totalAmount + vat;
-    vat = Number(vat.toFixed(2));
-    payable = Number(payable.toFixed(2));
+    vat = round2(vat);
+    payable = round2(payable);
 
-    // ===========2. Prepare Customer Details and Shipping Details ===========
+    // =========== 2. Prepare Customer Details and Shipping Details ===========
     const profile = await ProfileModel.findOne({ userID }).lean();
     if (!profile) {
-      return { status: "fail", message: "Profile not found. Complete profile first." };
+      return {
+        status: "error",
+        message: "Profile not found. Complete profile first.",
+      };
     }
 
     const cus_details = `Name: ${profile.cus_name}, Email: ${email}, Address: ${profile.cus_add}, Phone: ${profile.cus_phone}`;
     const ship_details = `Name: ${profile.ship_name}, City: ${profile.ship_city}, Address: ${profile.ship_add}, Phone: ${profile.ship_phone}`;
 
-    // ===========3. Create Invoice ===========
+    // =========== 3. Create Invoice ===========
     const session = await startSession();
     let invoice;
-
+    const tran_id = crypto.randomUUID();
     try {
       await session.withTransaction(async () => {
-        const tran_id = crypto.randomUUID() ;
-
         // Create invoice
         invoice = await InvoiceModel.create(
           [
@@ -97,20 +105,56 @@ const CreateInvoiceService = async ({ user_ID, email }) => {
         // Clear cart
         await CartModel.deleteMany({ userID }, { session });
       });
-
-      return { status: "success", data: invoice };
     } catch (err) {
       return { status: "error", message: err.message };
     } finally {
       session.endSession();
     }
 
-    // ===========4. Prepare SSL Payment ===========
+    // =========== 4. Prepare SSLCommerz Payment ===========
+    let PaymentSettings = await PaymentSettingModel.find();
+    const form = new FormData();
 
-    return {
-      status: "success",
-      message: "Invoice created successfully",
-    };
+    // payment settings
+    form.append("store_id", PaymentSettings[0].store_id);
+    form.append("store_passwd", PaymentSettings[0].store_passwd);
+    form.append("total_amount", payable.toString());
+    form.append("currency", PaymentSettings[0].currency);
+    form.append("tran_id", tran_id);
+    form.append("success_url", PaymentSettings[0].success_url);
+    form.append("fail_url", PaymentSettings[0].fail_url);
+    form.append("cancel_url", PaymentSettings[0].cancel_url);
+    form.append("ipn_url", PaymentSettings[0].ipn_url);
+
+    // customer details
+    form.append("cus_name", profile.cus_name);
+    form.append("cus_email", email);
+    form.append("cus_add1", profile.cus_add);
+    form.append("cus_city", profile.cus_city);
+    form.append("cus_state", profile.cus_state);
+    form.append("cus_postcode", profile.cus_postcode);
+    form.append("cus_country", profile.cus_country);
+    form.append("cus_phone", profile.cus_phone);
+
+    // shipping details
+    form.append("shipping_method", "YES");
+    form.append("ship_name", profile.ship_name);
+    form.append("ship_add1", profile.ship_add);
+    form.append("ship_city", profile.ship_city);
+    form.append("ship_state", profile.ship_state);
+    form.append("ship_postcode", profile.ship_postcode);
+    form.append("ship_country", profile.ship_country);
+    form.append("ship_phone", profile.ship_phone);
+
+    // product details
+    form.append("product_name", "MERN Shop product");
+    form.append("product_category", "MERN Shop product category");
+    form.append("product_profile", "According to invoice");
+    form.append("product_amount", "According to invoice");
+
+    const SSLRes = await axios.post(PaymentSettings[0].init_url, form);
+
+    return { status: "success", data: SSLRes.data };
   } catch (error) {
     return { status: "error", message: error.message };
   }
