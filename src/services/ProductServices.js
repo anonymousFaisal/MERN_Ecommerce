@@ -251,6 +251,23 @@ const ReviewListService = async (productID) => {
   }
 };
 
+const CreateReviewService = async ({ userID, ...review }) => {
+  try {
+    const { productID, des, rating } = review;
+
+    const newReview = await ReviewModel.create({
+      productID,
+      userID,
+      des,
+      rating,
+    });
+
+    return { status: "success", data: newReview };
+  } catch (error) {
+    return { status: "error", message: error.message };
+  }
+};
+
 module.exports = {
   BrandListService,
   CategoryListService,
@@ -262,4 +279,5 @@ module.exports = {
   ListByRemarkService,
   DetailsService,
   ReviewListService,
+  CreateReviewService,
 };

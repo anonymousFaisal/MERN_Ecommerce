@@ -19,6 +19,7 @@ router.get("/ProductListBySearch/:Keyword", ProductController.ProductListBySearc
 router.get("/ProductListByRemark/:Remark", ProductController.ProductListByRemark);
 router.get("/ProductDetails/:ProductID", ProductController.ProductDetails);
 router.get("/ProductReviewList/:ProductID", ProductController.ProductReviewList);
+router.post("/CreateReview", AuthVerification, ProductController.ProductCreateReview);
 
 // User Routes
 router.get("/UserOTP/:email", UserController.UserOTP);

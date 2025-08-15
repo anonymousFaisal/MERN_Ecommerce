@@ -9,6 +9,7 @@ const {
   ListByRemarkService,
   DetailsService,
   ReviewListService,
+  CreateReviewService,
 } = require("../services/ProductServices");
 
 // Controller functions for product-related operations
@@ -106,7 +107,6 @@ exports.ProductListBySearch = async (req, res) => {
   }
 };
 
-
 // Get product details and reviews
 exports.ProductDetails = async (req, res) => {
   try {
@@ -122,6 +122,21 @@ exports.ProductReviewList = async (req, res) => {
   try {
     const { ProductID } = req.params;
     const result = await ReviewListService(ProductID);
+    const statusCode = result.status === "success" ? 200 : 400;
+    return res.status(statusCode).json(result);
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
+exports.ProductCreateReview = async (req, res) => {
+  try {
+    const review = req.body;
+    const userID = req.user?.id;
+    if (!userID) {
+      return res.status(401).json({ status: "fail", message: "Unauthorized" });
+    }
+    const result = await CreateReviewService({ userID, ...review });
     const statusCode = result.status === "success" ? 200 : 400;
     return res.status(statusCode).json(result);
   } catch (error) {
