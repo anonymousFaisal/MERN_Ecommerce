@@ -6,6 +6,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./assets/css/animate.min.css";
 import "./assets/css/main.css";
+import 'react-loading-skeleton/dist/skeleton.css';
+
 
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 

@@ -6,7 +6,7 @@ const Footer = () => {
   return (
     <footer>
       {/* Top section */}
-      <div className="section-bottom shadow-sm bg-light">
+      <div className="section-bottom shadow-sm bg-white">
         <div className="container py-5">
           <div className="row g-4">
             {/* Legals */}
@@ -56,7 +56,7 @@ const Footer = () => {
             {/* About */}
             <div className="col-12 col-md-4">
               <h5 className="fw-bold mb-3">About</h5>
-              <p className="text-muted small">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum</p>
+              <p className="text-muted mb-2">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum</p>
               <img src={logo} alt="Payment Methods" className="img-fluid mt-2" style={{ maxWidth: "200px" }} />
             </div>
           </div>
