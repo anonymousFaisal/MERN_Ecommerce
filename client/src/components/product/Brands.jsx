@@ -1,11 +1,15 @@
-import React from 'react';
+import React from "react";
+import useProductStore from "../../store/useProductStore";
+import BrandsSkeleton from "./../../skeleton/BrandsSkeleton";
 
 const Brands = () => {
-    return (
-        <div>
-            
-        </div>
-    );
+  const { brandList } = useProductStore();
+
+  if (brandList === null) {
+    return <BrandsSkeleton />;
+  } else {
+    return <div></div>;
+  }
 };
 
 export default Brands;
