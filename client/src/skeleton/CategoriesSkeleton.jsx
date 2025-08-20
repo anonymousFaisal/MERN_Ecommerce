@@ -13,8 +13,8 @@ const CategoriesSkeleton = () => {
             Explore a World of Choices Across Our Most Popular <br />
             Shopping Categories{" "}
           </span>
-          {Array.from({ length: 16 }).map(() => (
-            <div className="col-6 col-lg-8r text-center col-md-8r p-2">
+          {Array.from({ length: 16 }).map((index) => (
+            <div key={index} className="col-6 col-lg-8r text-center col-md-8r p-2">
               <div className="card h-100 rounded-3 bg-light">
                 <div className="card-body">
                   <Lottie className="w-100" animationData={ImagePlaceHolder} loop={true} />

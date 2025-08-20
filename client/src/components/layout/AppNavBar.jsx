@@ -1,11 +1,23 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Link, NavLink } from "react-router-dom";
 import logo from "../../assets/images/plainb-logo.svg";
+import useProductStore from "../../store/useProductStore";
 
 const AppNavBar = () => {
-  // Example counts (wire these to state/store later)
-  const cartCount = 0;
-  const wishCount = 0;
+  const navigate = useNavigate();
+  const { searchQuery, setSearchQuery } = useProductStore();
+  const cartCount = 0; // Replace with actual cart count from your store
+  const wishCount = 0; // Replace with actual wishlist count from your store
+  const onSubmit = (e) => {
+    e.preventDefault();
+    const q = (searchQuery || "").trim();
+    if (q.length > 0) {
+      navigate(`/by-search/${encodeURIComponent(q)}`); 
+    } else {
+      navigate("/");
+    }
+  };
 
   return (
     <>
@@ -75,14 +87,15 @@ const AppNavBar = () => {
 
             {/* Search + actions */}
             <div className="d-flex align-items-center gap-2">
-              <form className="input-group" role="search" onSubmit={(e) => e.preventDefault()}>
+              <form className="input-group" role="search" onSubmit={onSubmit}>
                 <input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="form-control"
                   type="search"
                   placeholder="Search products..."
-                  aria-label="Search products"
                 />
-                <button className="btn btn-outline-dark" type="submit" aria-label="Search">
+                <button className="btn btn-outline-dark" type="submit">
                   <i className="bi bi-search"></i>
                 </button>
               </form>

@@ -18,9 +18,9 @@ const Brands = () => {
               Explore a World of Choices Across Our Most Popular <br />
               Shopping Categories{" "}
             </span>
-            {brandList.map((item) => (
-              <div className="col-6 col-lg-8r text-center col-md-8r p-2">
-                <Link to={`/by_brand/${item._id}`} className="card h-100 rounded-3 bg-white">
+            {brandList.map((item, index) => (
+              <div key={index} className="col-6 col-lg-8r text-center col-md-8r p-2">
+                <Link to={`/by-brand/${item._id}`} className="card h-100 rounded-3 bg-white">
                   <div className="card-body d-flex flex-column align-items-center justify-content-between">
                     <div className="d-flex flex-grow-1 align-items-center justify-content-center">
                       <img alt={item.brandName} className="w-75" src={item.brandImg} />

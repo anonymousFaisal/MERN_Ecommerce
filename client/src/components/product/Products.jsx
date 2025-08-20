@@ -20,7 +20,7 @@ const Products = () => {
       return <div className="col-12 py-5 text-center text-muted">No products found.</div>;
     }
 
-    return listByRemark.map((item) => {
+    return listByRemark.map((item, index) => {
       const hasDiscount = item?.discount === true && item?.discountPrice;
       const priceBlock = hasDiscount ? (
         <p className="bodyMedium text-dark my-1">
@@ -31,7 +31,7 @@ const Products = () => {
       );
 
       return (
-        <div key={item._id} className="col-md-3 p-2 col-lg-3 col-sm-6 col-12">
+        <div key={index} className="col-md-3 p-2 col-lg-3 col-sm-6 col-12">
           <Link to={`/details/${item._id}`} className="card shadow-sm h-100 rounded-3 bg-white text-decoration-none">
             <img className="w-100 rounded-top-2" src={item.image} alt={item.title} />
             <div className="card-body">
