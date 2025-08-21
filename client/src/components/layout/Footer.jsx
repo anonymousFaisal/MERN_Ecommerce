@@ -24,6 +24,11 @@ const Footer = () => {
                   </Link>
                 </li>
                 <li className="mb-2">
+                  <Link className="nav-link p-0" to="/privacy">
+                    Privacy
+                  </Link>
+                </li>
+                <li className="mb-2">
                   <Link className="nav-link p-0" to="/terms">
                     Terms
                   </Link>
