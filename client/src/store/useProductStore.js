@@ -12,6 +12,8 @@ const useProductStore = create((set) => ({
   sliderList: null,
   listByRemark: null,
   listProduct: null,
+  details : null,
+  reviewList: null,
 
   // --- Fetchers ---
   fetchBrands: async () => {
@@ -86,6 +88,35 @@ const useProductStore = create((set) => ({
       set({ listProduct: null });
       const res = await axios.get(`/api/v1/ProductListBySearch/${encodeURIComponent(query)}`);
       if (res.data.status === "success") set({ listProduct: res.data.data });
+    } catch (e) {
+      console.error(e);
+    }
+  },
+  fetchListByFilter: async (data) => {
+    try {
+      set({ listProduct: null });
+      const res = await axios.post(`/api/v1/ProductListByFilter`, data);
+      if (res.data.status === "success") set({ listProduct: res.data.data });
+    } catch (e) {
+      console.error(e);
+    }
+  },
+
+  fetchDetails: async (productID) => {
+    try {
+      set({ details: null });
+      const res = await axios.get(`/api/v1/ProductDetails/${productID}`);
+      if (res.data.status === "success") set({ details: res.data.data });
+    } catch (e) {
+      console.error(e);
+    }
+  },
+
+  fetchReviews: async (productID) => {
+    try {
+      set({ reviewList: null });
+      const res = await axios.get(`/api/v1/ProductReviewList/${productID}`);
+      if (res.data.status === "success") set({ reviewList: res.data.data });
     } catch (e) {
       console.error(e);
     }
