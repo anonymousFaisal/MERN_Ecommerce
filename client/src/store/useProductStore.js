@@ -12,7 +12,7 @@ const useProductStore = create((set) => ({
   sliderList: null,
   listByRemark: null,
   listProduct: null,
-  details : null,
+  details: null,
   reviewList: null,
 
   // --- Fetchers ---
@@ -106,7 +106,10 @@ const useProductStore = create((set) => ({
     try {
       set({ details: null });
       const res = await axios.get(`/api/v1/ProductDetails/${productID}`);
-      if (res.data.status === "success") set({ details: res.data.data });
+      if (res.data.status === "success") {
+        const product = res.data.data?.[0] ?? null;
+        set({ details: product });
+      }
     } catch (e) {
       console.error(e);
     }
