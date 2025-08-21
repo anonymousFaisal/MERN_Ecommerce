@@ -10,6 +10,7 @@ const {
   DetailsService,
   ReviewListService,
   CreateReviewService,
+  ListByFilterService,
 } = require("../services/ProductServices");
 
 // Controller functions for product-related operations
@@ -106,6 +107,17 @@ exports.ProductListBySearch = async (req, res) => {
     return res.status(500).json({ status: "error", message: error.message });
   }
 };
+
+exports.ProductListByFilter = async (req, res) => {
+  try {
+    const filter = req.body;
+    const result = await ListByFilterService(filter);
+    const statusCode = result.status === "success" ? 200 : 400;
+    return res.status(statusCode).json(result);
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: error.message });
+  }
+}
 
 // Get product details and reviews
 exports.ProductDetails = async (req, res) => {
