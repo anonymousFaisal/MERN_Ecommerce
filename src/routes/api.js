@@ -54,5 +54,6 @@ router.post("/PaymentIPN/:trxID", InvoiceController.PaymentIPN);
 
 // Feature Routes
 router.get("/FeatureList", FeatureController.FeatureList);
+router.get("/LegalDetails/:type", FeatureController.LegalDetails);
 
 module.exports = router;
