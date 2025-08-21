@@ -12,6 +12,8 @@ import RefundPage from "./pages/RefundPage";
 import HowToBuyPage from "./pages/HowToBuyPage";
 import ContactPage from "./pages/ContactPage";
 import ComplainPage from "./pages/ComplainPage";
+import LoginPage from "./pages/LoginPage";
+import OtpPage from "./pages/OtpPage";
 
 // Main App component
 
@@ -20,10 +22,13 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        {/* Product routes */}
         <Route path="/by-brand/:brandID" element={<ProductByBrand />} />
         <Route path="/by-category/:categoryID" element={<ProductByCategory />} />
         <Route path="/by-search/:searchQuery" element={<ProductBySearch />} />
         <Route path="/details/:productID" element={<ProductDetails />} />
+
+        {/* Legal page routes */}
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/about" element={<AboutPage />} />
@@ -31,6 +36,10 @@ const App = () => {
         <Route path="/how-to-buy" element={<HowToBuyPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/complain" element={<ComplainPage />} />
+
+        {/* Login routes */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/otp" element={<OtpPage />} />
       </Routes>
     </BrowserRouter>
   );
