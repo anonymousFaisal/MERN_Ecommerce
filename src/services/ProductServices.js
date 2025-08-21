@@ -197,6 +197,42 @@ const ListBySearchService = async (keyword) => {
   }
 };
 
+const ListByFilterService = async (filter) => {
+  try {
+    let matchConditions = {};
+    if (filter.categoryID) {
+      matchConditions.categoryID = new Types.ObjectId(filter.categoryID);
+    }
+    if (filter.brandID) {
+      matchConditions.brandID = new Types.ObjectId(filter.brandID);
+    }
+
+    let priceMin = parseInt(filter.priceMin);
+    let priceMax = parseInt(filter.priceMax);
+    let priceConditions = {};
+    if (!isNaN(priceMin)) priceConditions.$gte = priceMin;
+    if (!isNaN(priceMax)) priceConditions.$lte = priceMax;
+
+    let data = await ProductModel.aggregate([
+      { $match: matchConditions },
+      { $addFields: { numericPrice: { $toInt: "$price" } } },
+      ...(Object.keys(priceConditions).length
+        ? [{ $match: { numericPrice: priceConditions } }]
+        : []),
+      { $lookup: { from: "brands", localField: "brandID", foreignField: "_id", as: "brand" } },
+      { $unwind: "$brand" },
+      { $lookup: { from: "categories", localField: "categoryID", foreignField: "_id", as: "category" } },
+      { $unwind: "$category" },
+      { $project: { "brand._id": 0, "category._id": 0, brandID: 0, categoryID: 0 } },
+    ]);
+
+    return { status: "success", data };
+  } catch (error) {
+    return { status: "error", message: error.message };
+  }
+};
+
+
 // Service to get product details and reviews
 const DetailsService = async (productID) => {
   try {
@@ -280,4 +316,5 @@ module.exports = {
   DetailsService,
   ReviewListService,
   CreateReviewService,
+  ListByFilterService,
 };
