@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { Link, NavLink } from "react-router-dom";
 import logo from "../../assets/images/plainb-logo.svg";
 import useProductStore from "../../store/useProductStore";
+import useUserStore from "../../store/useUserStore";
 
 const AppNavBar = () => {
   const navigate = useNavigate();
+  const { isLoggedIn } = useUserStore();
   const { searchQuery, setSearchQuery } = useProductStore();
   const cartCount = 0; // Replace with actual cart count from your store
   const wishCount = 0; // Replace with actual wishlist count from your store
@@ -13,7 +15,7 @@ const AppNavBar = () => {
     e.preventDefault();
     const q = (searchQuery || "").trim();
     if (q.length > 0) {
-      navigate(`/by-search/${encodeURIComponent(q)}`); 
+      navigate(`/by-search/${encodeURIComponent(q)}`);
     } else {
       navigate("/");
     }
@@ -120,14 +122,22 @@ const AppNavBar = () => {
                 )}
               </Link>
 
-              <Link className="btn btn-success" to="/profile">
-                Profile
-              </Link>
-
-              {/* If you have auth state, conditionally render Login/Logout */}
-              <Link className="btn btn-outline-dark" to="/logout">
-                Logout
-              </Link>
+              {isLoggedIn ? (
+                <>
+                  <Link className="btn btn-success" to="/profile">
+                    Profile
+                  </Link>
+                  <Link className="btn btn-outline-dark" to="/logout">
+                    Logout
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link className="btn btn-success" to="/login">
+                    Login
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
