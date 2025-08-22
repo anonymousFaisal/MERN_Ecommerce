@@ -9,9 +9,7 @@ const useUserStore = create((set) => ({
   loginFormData: { email: "" },
   otpFormData: { otp: "" },
 
-  isLoggedIn: () => {
-    return !!Cookies.get("token");
-  },
+  isLoggedIn: !!Cookies.get("token"),
 
   loginFormOnChange: (name, value) => {
     set((state) => ({
@@ -48,7 +46,27 @@ const useUserStore = create((set) => ({
     try {
       const email = getEmail();
       const res = await axios.get(`/api/v1/VerifyOTP/${email}/${otp}`);
-      return res?.data?.status === "success";
+      const ok = res?.data?.status === "success";
+      if (ok) {
+        set({ isLoggedIn: true });
+      }
+      return ok;
+    } catch (e) {
+      console.error(e);
+      return false;
+    } finally {
+      set({ isFormSubmit: false });
+    }
+  },
+  fetchUserLogout: async () => {
+    set({ isFormSubmit: true });
+    try {
+      const res = await axios.get("/api/v1/UserLogout");
+      const ok = res?.data?.status === "success";
+      if (ok) {
+        set({ isLoggedIn: false });
+      }
+      return ok;
     } catch (e) {
       console.error(e);
       return false;

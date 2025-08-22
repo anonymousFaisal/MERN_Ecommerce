@@ -4,10 +4,11 @@ import { Link, NavLink } from "react-router-dom";
 import logo from "../../assets/images/plainb-logo.svg";
 import useProductStore from "../../store/useProductStore";
 import useUserStore from "../../store/useUserStore";
+import UserSubmitButton from "../user/UserSubmitButton";
 
 const AppNavBar = () => {
   const navigate = useNavigate();
-  const { isLoggedIn } = useUserStore();
+  const { isLoggedIn, fetchUserLogout } = useUserStore();
   const { searchQuery, setSearchQuery } = useProductStore();
   const cartCount = 0; // Replace with actual cart count from your store
   const wishCount = 0; // Replace with actual wishlist count from your store
@@ -19,6 +20,13 @@ const AppNavBar = () => {
     } else {
       navigate("/");
     }
+  };
+
+  const onLogOut = async () => {
+    await fetchUserLogout();
+    sessionStorage.clear();
+    localStorage.clear();
+    navigate("/");
   };
 
   return (
@@ -127,9 +135,7 @@ const AppNavBar = () => {
                   <Link className="btn btn-success" to="/profile">
                     Profile
                   </Link>
-                  <Link className="btn btn-outline-dark" to="/logout">
-                    Logout
-                  </Link>
+                  <UserSubmitButton onClick={onLogOut} text="Logout" className="btn btn-outline-dark" />
                 </>
               ) : (
                 <>

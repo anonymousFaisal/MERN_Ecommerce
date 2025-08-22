@@ -33,7 +33,7 @@ const Products = () => {
       return (
         <div key={index} className="col-md-3 p-2 col-lg-3 col-sm-6 col-12">
           <Link to={`/details/${item._id}`} className="card shadow-sm h-100 rounded-3 bg-white text-decoration-none">
-            <img className="w-100 rounded-top-2" src={item.image} alt={item.title} />
+            <img className="w-100 rounded-top-2 p-2" src={item.image} alt={item.title} />
             <div className="card-body">
               <p className="bodySmal text-secondary my-1">{item.title}</p>
               {priceBlock}
