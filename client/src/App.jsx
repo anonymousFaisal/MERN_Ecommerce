@@ -14,6 +14,7 @@ import ContactPage from "./pages/ContactPage";
 import ComplainPage from "./pages/ComplainPage";
 import LoginPage from "./pages/LoginPage";
 import OtpPage from "./pages/OtpPage";
+import ProfilePage from "./pages/ProfilePage";
 
 // Main App component
 
@@ -40,6 +41,9 @@ const App = () => {
         {/* Login routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/otp" element={<OtpPage />} />
+
+        {/* Profile routes */}
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
     </BrowserRouter>
   );
