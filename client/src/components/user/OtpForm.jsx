@@ -1,5 +1,6 @@
 import React from "react";
-import SubmitButton from "../layout/SubmitButton";
+
+import UserSubmitButton from "./UserSubmitButton";
 
 const OtpForm = () => {
   return (
@@ -10,7 +11,7 @@ const OtpForm = () => {
             <h4>Enter Verification Code</h4>
             <p>A verification code has been sent to the email address you provide</p>
             <input placeholder="Verification" type="text" className="form-control" />
-            <SubmitButton submit={false} className="btn mt-3 btn-success" text="Submit" />
+            <UserSubmitButton submit={false} className="btn mt-3 btn-success" text="Submit" />
           </div>
         </div>
       </div>
