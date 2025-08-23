@@ -6,13 +6,14 @@ import useProductStore from "../../store/useProductStore";
 import useUserStore from "../../store/useUserStore";
 import UserSubmitButton from "../user/UserSubmitButton";
 import useCartStore from "../../store/useCartStore";
+import useWishStore from "../../store/useWishStore";
 
 const AppNavBar = () => {
   const navigate = useNavigate();
   const { isLoggedIn, fetchUserLogout } = useUserStore();
   const { searchQuery, setSearchQuery } = useProductStore();
   const { cartCount, fetchCartList, resetCart } = useCartStore();
-  const wishCount = 0;
+  const { wishCount, fetchWishList, resetWish } = useWishStore();
   const onSubmit = (e) => {
     e.preventDefault();
     const q = (searchQuery || "").trim();
@@ -28,15 +29,18 @@ const AppNavBar = () => {
     sessionStorage.clear();
     localStorage.clear();
     resetCart();
+    resetWish();
     navigate("/");
   };
   useEffect(() => {
     if (isLoggedIn) {
       fetchCartList().catch(() => {});
+      fetchWishList().catch(() => {});
     } else {
       resetCart();
+      resetWish();
     }
-  }, [isLoggedIn, fetchCartList, resetCart]);
+  }, [isLoggedIn, fetchCartList, resetCart, fetchWishList, resetWish]);
 
   return (
     <>
@@ -93,11 +97,19 @@ const AppNavBar = () => {
           <div className="collapse navbar-collapse" id="nav06">
             {/* Left nav links */}
             <ul className="navbar-nav ms-lg-3 me-auto my-3 my-lg-0">
-              <li className="nav-item me-lg-2">
-                <NavLink className="nav-link" to="/" end>
-                  Home
+              <li className="nav-item">
+                <NavLink
+                  to="/"
+                  end
+                  className={({ isActive }) =>
+                    `btn border rounded-3 d-inline-flex align-items-center px-3 py-2 ${isActive ? "btn-success text-white" : "btn-light text-dark"}`
+                  }
+                >
+                  <i className="bi bi-house-door me-2"></i>
+                  <span className="fw-semibold">Home</span>
                 </NavLink>
               </li>
+
               {/* Add more:
               <li className="nav-item"><NavLink className="nav-link" to="/shop">Shop</NavLink></li>
               <li className="nav-item"><NavLink className="nav-link" to="/contact">Contact</NavLink></li>
@@ -119,25 +131,37 @@ const AppNavBar = () => {
                 </button>
               </form>
 
-              <Link to="/cart" className="btn btn-light position-relative" aria-label="Cart">
-                <i className="bi bi-bag fs-5 text-dark"></i>
+              <NavLink
+                to="/cart"
+                aria-label="Cart"
+                className={({ isActive }) =>
+                  `btn ms-2 position-relative d-inline-flex align-items-center ${isActive ? "btn-success text-white" : "btn-light text-dark"}`
+                }
+              >
+                <i className="bi bi-bag fs-5 me-1"></i>
                 {cartCount > 0 && (
-                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
                     {cartCount}
                     <span className="visually-hidden">items in cart</span>
                   </span>
                 )}
-              </Link>
+              </NavLink>
 
-              <Link to="/wish" className="btn btn-light position-relative" aria-label="Wishlist">
-                <i className="bi bi-heart fs-5 text-dark"></i>
+              <NavLink
+                to="/wish"
+                aria-label="Wishlist"
+                className={({ isActive }) =>
+                  `btn ms-2 position-relative d-inline-flex align-items-center ${isActive ? "btn-success text-white" : "btn-light text-dark"}`
+                }
+              >
+                <i className="bi bi-heart fs-5 me-1"></i>
                 {wishCount > 0 && (
                   <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                     {wishCount}
                     <span className="visually-hidden">items in wishlist</span>
                   </span>
                 )}
-              </Link>
+              </NavLink>
 
               {isLoggedIn ? (
                 <>

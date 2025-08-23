@@ -8,12 +8,14 @@ import Reviews from "./Reviews";
 import CartSubmitButton from "./../cart/CartSubmitButton";
 import useCartStore from "../../store/useCartStore";
 import toast from "react-hot-toast";
+import useWishStore from "../../store/useWishStore";
+import WishSubmitButton from './../wish/WishSubmitButton';
 
 const Details = () => {
   const { details } = useProductStore();
   const [Quantity, setQuantity] = useState(1);
   const { cartForm, cartFormOnChange, fetchCartList, fetchCartCreate } = useCartStore();
-
+  const {fetchWishCreate, fetchWishList } = useWishStore();
   const increment = () => {
     setQuantity((prev) => {
       const newVal = prev + 1;
@@ -35,6 +37,13 @@ const Details = () => {
     if (res) {
       toast.success("Product added to cart successfully");
       await fetchCartList();
+    }
+  };
+  const addToWish = async (productID) => {
+    let res = await fetchWishCreate(productID);
+    if (res) {
+      toast.success("Product added to wishlist successfully");
+      await fetchWishList();
     }
   };
 
@@ -105,7 +114,7 @@ const Details = () => {
                   <CartSubmitButton className="btn w-100 btn-success" onClick={async () => await addToCart(details._id)} text="Add to Cart" />
                 </div>
                 <div className="col-4 p-2">
-                  <button className="btn w-100 btn-success">Add to Wish</button>
+                  <WishSubmitButton className="btn w-100 btn-success" onClick={async () => await addToWish(details._id)} text="Add to Wishlist" />
                 </div>
               </div>
             </div>
