@@ -5,6 +5,7 @@ import ProductImages from "./ProductImages";
 import useProductStore from "../../store/useProductStore";
 import ProductDetailSkeleton from "../../skeleton/ProductDetailSkeleton";
 import Reviews from "./Reviews";
+import CartSubmitButton from './../cart/CartSubmitButton';
 
 const Details = () => {
   const { details } = useProductStore();
@@ -78,7 +79,7 @@ const Details = () => {
                   </div>
                 </div>
                 <div className="col-4 p-2">
-                  <button className="btn w-100 btn-success">Add to Cart</button>
+                  <CartSubmitButton className="btn w-100 btn-success" onClick={() => console.log("test")} text="Add to Cart" />
                 </div>
                 <div className="col-4 p-2">
                   <button className="btn w-100 btn-success">Add to Wish</button>
