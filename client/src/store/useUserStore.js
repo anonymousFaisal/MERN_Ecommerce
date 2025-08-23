@@ -7,23 +7,13 @@ import { getEmail, setEmail, unauthorized } from "../utility/utility";
 const useUserStore = create((set) => ({
   // login and otp onchange actions
   loginFormData: { email: "" },
-  loginFormOnChange: (name, value) => {
-    set((state) => ({
-      loginFormData: { ...state.loginFormData, [name]: value },
-    }));
-  },
+  loginFormOnChange: (name, value) => set((state) => ({ loginFormData: { ...state.loginFormData, [name]: value } })),
 
   otpFormData: { otp: "" },
-  otpFormOnChange: (name, value) => {
-    set((state) => ({
-      otpFormData: { ...state.otpFormData, [name]: value },
-    }));
-  },
+  otpFormOnChange: (name, value) => set((state) => ({ otpFormData: { ...state.otpFormData, [name]: value } })),
 
   isFormSubmit: false,
-  setFormSubmit: (submit) => {
-    set({ isFormSubmit: submit });
-  },
+  setFormSubmit: (submit) => set({ isFormSubmit: submit }),
 
   // Login and OTP api
   fetchUserOtp: async (email) => {
@@ -49,9 +39,7 @@ const useUserStore = create((set) => ({
       const email = getEmail();
       const res = await axios.get(`/api/v1/VerifyOTP/${email}/${otp}`);
       const ok = res?.data?.status === "success";
-      if (ok) {
-        set({ isLoggedIn: true });
-      }
+      if (ok) set({ isLoggedIn: true });
       return ok;
     } catch (e) {
       console.error(e);
@@ -67,9 +55,7 @@ const useUserStore = create((set) => ({
     try {
       const res = await axios.get("/api/v1/UserLogout");
       const ok = res?.data?.status === "success";
-      if (ok) {
-        set({ isLoggedIn: false });
-      }
+      if (ok) set({ isLoggedIn: false });
       return ok;
     } catch (e) {
       console.error(e);
@@ -79,7 +65,7 @@ const useUserStore = create((set) => ({
     }
   },
 
-  // Profile Api
+  // Profile api
   profileForm: {
     cus_add: "",
     cus_city: "",
@@ -97,37 +83,40 @@ const useUserStore = create((set) => ({
     ship_postcode: "",
     ship_state: "",
   },
-  profileFormOnChange: (name, value) => {
+
+  profileFormOnChange: (name, value) =>
     set((state) => ({
-      profileForm: { ...state.profileForm, [name]: value },
-    }));
-  },
+      profileForm: {
+        ...state.profileForm,
+        [name]: value,
+      },
+    })),
 
   profileDetails: null,
   fetchProfileDetails: async () => {
     try {
-      const res = await axios.get("/api/v1/ReadProfile");
-      if(res.data.data.length > 0) {
-        set({ profileDetails: res.data.data[0] });
-        set({ profileForm: res.data.data[0] });
-      }
-      else{
-        set({ profileDetails: [] });
+      const res = await axios.get(`/api/v1/ReadProfile`);
+      const profile = res?.data?.profile ?? null;
+      if (profile) {
+        set({ profileDetails: profile, profileForm: profile });
+      } else {
+        set({ profileDetails: {} }); 
       }
     } catch (e) {
-      unauthorized(e.response.status);
+      unauthorized(e?.response?.status);
     }
   },
 
-  fetchProfileUpdate: async (data) => {
+  fetchProfileUpdate: async (postBody) => {
     try {
-      set({profileDetails: null});
-      const res = await axios.post("/api/v1/UpdateProfile", data);
+      set({ profileDetails: null });
+      const res = await axios.post(`/api/v1/UpdateProfile`, postBody);
       return res?.data?.status === "success";
     } catch (e) {
-      unauthorized(e.response.status);
+      unauthorized(e?.response?.status);
+      return false;
     }
-  }
+  },
 }));
 
 export default useUserStore;

@@ -8,7 +8,7 @@ const Layout = (props) => {
   const params = useLocation().pathname;
   useEffect(() => {
     window.scrollTo(0, 0);
-  },[params]);
+  }, [params]);
   return (
     <div>
       <AppNavBar />
