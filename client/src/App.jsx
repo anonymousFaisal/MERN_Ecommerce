@@ -15,6 +15,8 @@ import ComplainPage from "./pages/ComplainPage";
 import LoginPage from "./pages/LoginPage";
 import OtpPage from "./pages/OtpPage";
 import ProfilePage from "./pages/ProfilePage";
+import WishPage from "./pages/WishPage";
+import CartPage from "./pages/CartPage";
 
 // Main App component
 
@@ -44,6 +46,10 @@ const App = () => {
 
         {/* Profile routes */}
         <Route path="/profile" element={<ProfilePage />} />
+
+        {/* Wish and Cart */}
+        <Route path="/wish" element={<WishPage />} />
+        <Route path="/cart" element={<CartPage />} />
       </Routes>
     </BrowserRouter>
   );

@@ -35,6 +35,16 @@ const useWishStore = create((set) => ({
       unauthorized(status);
     }
   },
+  fetchRemoveWish: async (productID) => {
+    try {
+      set({ wishList: null });
+      const res = await axios.post(`/api/v1/RemoveWishlist`, { productID });
+      return res?.data?.status === "success";
+    } catch (e) {
+      unauthorized(e?.response?.status);
+      return false;
+    }
+  },
 }));
 
 export default useWishStore;

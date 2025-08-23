@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import logo from "../../assets/images/plainb-logo.svg";
 import useProductStore from "../../store/useProductStore";
 import useUserStore from "../../store/useUserStore";
@@ -14,6 +13,7 @@ const AppNavBar = () => {
   const { searchQuery, setSearchQuery } = useProductStore();
   const { cartCount, fetchCartList, resetCart } = useCartStore();
   const { wishCount, fetchWishList, resetWish } = useWishStore();
+
   const onSubmit = (e) => {
     e.preventDefault();
     const q = (searchQuery || "").trim();
@@ -32,6 +32,7 @@ const AppNavBar = () => {
     resetWish();
     navigate("/");
   };
+
   useEffect(() => {
     if (isLoggedIn) {
       fetchCartList().catch(() => {});
@@ -79,7 +80,7 @@ const AppNavBar = () => {
       <nav className="navbar sticky-top navbar-expand-lg navbar-light bg-white py-3 shadow-sm">
         <div className="container">
           <Link className="navbar-brand d-flex align-items-center" to="/">
-            <img src={logo} alt="PlanB" width="96" height="auto" className="img-fluid" />
+            <img src={logo} alt="PlanB" width="96" className="img-fluid" />
           </Link>
 
           <button
@@ -96,7 +97,7 @@ const AppNavBar = () => {
 
           <div className="collapse navbar-collapse" id="nav06">
             {/* Left nav links */}
-            <ul className="navbar-nav ms-lg-3 me-auto my-3 my-lg-0">
+            <ul className="navbar-nav ms-lg-3 me-auto my-3 my-lg-0 d-flex flex-row gap-2">
               <li className="nav-item">
                 <NavLink
                   to="/"
@@ -110,10 +111,47 @@ const AppNavBar = () => {
                 </NavLink>
               </li>
 
-              {/* Add more:
-              <li className="nav-item"><NavLink className="nav-link" to="/shop">Shop</NavLink></li>
-              <li className="nav-item"><NavLink className="nav-link" to="/contact">Contact</NavLink></li>
-              */}
+              <li className="nav-item">
+                <NavLink
+                  to="/cart"
+                  aria-label="Cart"
+                  className={({ isActive }) =>
+                    `btn position-relative d-inline-flex align-items-center rounded-3 px-3 py-2 ${
+                      isActive ? "btn-success text-white" : "btn-light text-dark border"
+                    }`
+                  }
+                >
+                  <i className="bi bi-bag me-2"></i>
+                  Cart
+                  {cartCount > 0 && (
+                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
+                      {cartCount}
+                      <span className="visually-hidden">items in cart</span>
+                    </span>
+                  )}
+                </NavLink>
+              </li>
+
+              <li className="nav-item">
+                <NavLink
+                  to="/wish"
+                  aria-label="Wishlist"
+                  className={({ isActive }) =>
+                    `btn position-relative d-inline-flex align-items-center rounded-3 px-3 py-2 ${
+                      isActive ? "btn-success text-white" : "btn-light text-dark border"
+                    }`
+                  }
+                >
+                  <i className="bi bi-heart me-2"></i>
+                  Wish
+                  {wishCount > 0 && (
+                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                      {wishCount}
+                      <span className="visually-hidden">items in wishlist</span>
+                    </span>
+                  )}
+                </NavLink>
+              </li>
             </ul>
 
             {/* Search + actions */}
@@ -126,55 +164,40 @@ const AppNavBar = () => {
                   type="search"
                   placeholder="Search products..."
                 />
-                <button className="btn btn-outline-dark" type="submit">
+                <button className="btn btn-outline-dark" type="submit" aria-label="Search">
                   <i className="bi bi-search"></i>
                 </button>
               </form>
 
-              <NavLink
-                to="/cart"
-                aria-label="Cart"
-                className={({ isActive }) =>
-                  `btn ms-2 position-relative d-inline-flex align-items-center ${isActive ? "btn-success text-white" : "btn-light text-dark"}`
-                }
-              >
-                <i className="bi bi-bag fs-5 me-1"></i>
-                {cartCount > 0 && (
-                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
-                    {cartCount}
-                    <span className="visually-hidden">items in cart</span>
-                  </span>
-                )}
-              </NavLink>
-
-              <NavLink
-                to="/wish"
-                aria-label="Wishlist"
-                className={({ isActive }) =>
-                  `btn ms-2 position-relative d-inline-flex align-items-center ${isActive ? "btn-success text-white" : "btn-light text-dark"}`
-                }
-              >
-                <i className="bi bi-heart fs-5 me-1"></i>
-                {wishCount > 0 && (
-                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                    {wishCount}
-                    <span className="visually-hidden">items in wishlist</span>
-                  </span>
-                )}
-              </NavLink>
-
               {isLoggedIn ? (
                 <>
-                  <Link className="btn btn-success" to="/profile">
+                  <NavLink
+                    to="/profile"
+                    className={({ isActive }) =>
+                      `btn d-inline-flex align-items-center rounded-3 px-3 py-2 ${isActive ? "btn-success text-white" : "btn-light text-dark border"}`
+                    }
+                  >
+                    <i className="bi bi-person-circle me-2"></i>
                     Profile
-                  </Link>
-                  <UserSubmitButton onClick={onLogOut} text="Logout" className="btn btn-outline-dark" />
+                  </NavLink>
+
+                  <UserSubmitButton
+                    onClick={onLogOut}
+                    text="Logout"
+                    className="btn btn-outline-dark rounded-3 d-inline-flex align-items-center px-3 py-2"
+                  />
                 </>
               ) : (
                 <>
-                  <Link className="btn btn-success" to="/login">
+                  <NavLink
+                    to="/login"
+                    className={({ isActive }) =>
+                      `btn d-inline-flex align-items-center rounded-3 px-3 py-2 ${isActive ? "btn-success text-white" : "btn-light text-dark border"}`
+                    }
+                  >
+                    <i className="bi bi-box-arrow-in-right me-2"></i>
                     Login
-                  </Link>
+                  </NavLink>
                 </>
               )}
             </div>
