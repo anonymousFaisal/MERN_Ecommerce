@@ -1,17 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link, NavLink } from "react-router-dom";
 import logo from "../../assets/images/plainb-logo.svg";
 import useProductStore from "../../store/useProductStore";
 import useUserStore from "../../store/useUserStore";
 import UserSubmitButton from "../user/UserSubmitButton";
+import useCartStore from "../../store/useCartStore";
 
 const AppNavBar = () => {
   const navigate = useNavigate();
   const { isLoggedIn, fetchUserLogout } = useUserStore();
   const { searchQuery, setSearchQuery } = useProductStore();
-  const cartCount = 0; // Replace with actual cart count from your store
-  const wishCount = 0; // Replace with actual wishlist count from your store
+  const { cartCount, fetchCartList, resetCart } = useCartStore();
+  const wishCount = 0;
   const onSubmit = (e) => {
     e.preventDefault();
     const q = (searchQuery || "").trim();
@@ -26,8 +27,16 @@ const AppNavBar = () => {
     await fetchUserLogout();
     sessionStorage.clear();
     localStorage.clear();
+    resetCart();
     navigate("/");
   };
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchCartList().catch(() => {});
+    } else {
+      resetCart();
+    }
+  }, [isLoggedIn, fetchCartList, resetCart]);
 
   return (
     <>

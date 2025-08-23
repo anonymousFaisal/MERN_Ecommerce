@@ -5,18 +5,37 @@ import ProductImages from "./ProductImages";
 import useProductStore from "../../store/useProductStore";
 import ProductDetailSkeleton from "../../skeleton/ProductDetailSkeleton";
 import Reviews from "./Reviews";
-import CartSubmitButton from './../cart/CartSubmitButton';
+import CartSubmitButton from "./../cart/CartSubmitButton";
+import useCartStore from "../../store/useCartStore";
+import toast from "react-hot-toast";
 
 const Details = () => {
   const { details } = useProductStore();
   const [Quantity, setQuantity] = useState(1);
+  const { cartForm, cartFormOnChange, fetchCartList, fetchCartCreate } = useCartStore();
 
   const increment = () => {
-    setQuantity((prev) => prev + 1);
+    setQuantity((prev) => {
+      const newVal = prev + 1;
+      cartFormOnChange("qty", newVal);
+      return newVal;
+    });
   };
 
   const decrement = () => {
-    setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
+    setQuantity((prev) => {
+      const newVal = prev > 1 ? prev - 1 : 1;
+      cartFormOnChange("qty", newVal);
+      return newVal;
+    });
+  };
+
+  const addToCart = async (productID) => {
+    let res = await fetchCartCreate(cartForm, productID);
+    if (res) {
+      toast.success("Product added to cart successfully");
+      await fetchCartList();
+    }
   };
 
   if (details === null) {
@@ -46,7 +65,7 @@ const Details = () => {
               <div className="row">
                 <div className="col-4 p-2">
                   <label className="bodySmal">Size</label>
-                  <select className="form-control my-2 form-select">
+                  <select value={cartForm.size} onChange={(e) => cartFormOnChange("size", e.target.value)} className="form-control my-2 form-select">
                     <option value="">Size</option>
                     {details.details.size.split(",").map((item, index) => (
                       <option key={index} value={item}>
@@ -57,7 +76,11 @@ const Details = () => {
                 </div>
                 <div className="col-4 p-2">
                   <label className="bodySmal">Color</label>
-                  <select className="form-control my-2 form-select">
+                  <select
+                    value={cartForm.color}
+                    onChange={(e) => cartFormOnChange("color", e.target.value)}
+                    className="form-control my-2 form-select"
+                  >
                     <option value="">Color</option>
                     {details.details.color.split(",").map((item, index) => (
                       <option key={index} value={item}>
@@ -79,7 +102,7 @@ const Details = () => {
                   </div>
                 </div>
                 <div className="col-4 p-2">
-                  <CartSubmitButton className="btn w-100 btn-success" onClick={() => console.log("test")} text="Add to Cart" />
+                  <CartSubmitButton className="btn w-100 btn-success" onClick={async () => await addToCart(details._id)} text="Add to Cart" />
                 </div>
                 <div className="col-4 p-2">
                   <button className="btn w-100 btn-success">Add to Wish</button>

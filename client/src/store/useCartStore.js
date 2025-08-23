@@ -4,7 +4,7 @@ import { unauthorized } from "../utility/utility";
 
 const useCartStore = create((set) => ({
   isCartSubmit: false,
-  cartForm: { productID: "", color: "", qty: "", size: "" },
+  cartForm: { productID: "", color: "", qty: "1", size: "" },
   cartFormOnChange: (name, value) => {
     set((state) => ({
       cartForm: {
@@ -29,14 +29,19 @@ const useCartStore = create((set) => ({
 
   cartList: null,
   cartCount: 0,
+  resetCart: () => set({ cartList: null, cartCount: 0 }),
   fetchCartList: async () => {
     try {
-      let res = await axios.get(`/api/v1/CartList`);
-      set({ cartList: res?.data?.data, cartCount: res?.data?.data?.length });
+      const res = await axios.get(`/api/v1/CartList`);
+      const list = res?.data?.data || [];
+      set({ cartList: list, cartCount: list.length });
     } catch (e) {
-      unauthorized(e?.response?.status);
-    } finally {
-      set({ isCartSubmit: false });
+      const status = e?.response?.status;
+      if (status === 401) {
+        set({ cartList: null, cartCount: 0 });
+        return;
+      }
+      unauthorized(status);
     }
   },
 }));
