@@ -78,7 +78,7 @@ const useCartStore = create((set) => ({
     try {
       set({ isCartSubmit: true });
       const res = await axios.post(`/api/v1/CreateInvoice`);
-      window.location.href = res?.data?.data?.GatewaypPageURL;
+      window.location.href = res?.data?.data?.GatewayPageURL;
       return res?.data?.status === "success";
     } catch (e) {
       unauthorized(e?.response?.status);
