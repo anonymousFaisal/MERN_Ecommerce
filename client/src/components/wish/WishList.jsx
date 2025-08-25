@@ -5,6 +5,7 @@ import useWishStore from "../../store/useWishStore";
 import ProductsSkeleton from "../../skeleton/ProductsSkeleton";
 import NoData from "../layout/NoData";
 import useUserStore from "../../store/useUserStore";
+import toast from "react-hot-toast";
 
 const WishList = () => {
   const { wishList, fetchWishList, fetchRemoveWish } = useWishStore();
@@ -14,11 +15,13 @@ const WishList = () => {
     (async () => {
       await fetchWishList();
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const remove = async (productID) => {
     await fetchRemoveWish(productID);
     await fetchWishList();
+    toast.success("Product removed from wishlist");
   };
   if (!isLoggedIn) {
     return (
