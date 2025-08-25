@@ -67,11 +67,24 @@ const useCartStore = create((set) => ({
   fetchRemoveCart: async (cartID, productID) => {
     try {
       set({ cartList: null });
-      const res = await axios.post(`/api/v1/RemoveCartList`, { cartID, productID });
+      const res = await axios.post(`/api/v1/RemoveCartList`, { _id: cartID, productID });
       return res?.data?.status === "success";
     } catch (e) {
       unauthorized(e?.response?.status);
       return false;
+    }
+  },
+  fetchCreateInvoice: async () => {
+    try {
+      set({ isCartSubmit: true });
+      const res = await axios.post(`/api/v1/CreateInvoice`);
+      window.location.href = res?.data?.data?.GatewaypPageURL;
+      return res?.data?.status === "success";
+    } catch (e) {
+      unauthorized(e?.response?.status);
+      return false;
+    } finally {
+      set({ isCartSubmit: false });
     }
   },
 }));
