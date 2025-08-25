@@ -49,8 +49,8 @@ const Products = () => {
     <div className="section">
       <div className="container-fluid py-5 bg-light">
         <div className="row">
-          <h1 className="headline-4 text-center my-2 p-0">Our Products</h1>
-          <span className="bodySmal mb-3 text-center">Explore a World of Choices Across Our Most Popular</span>
+          <h1 className="headline-5 text-center my-2 p-0">Our Products</h1>
+          <span className="bodyMedium mb-3 text-center">Explore a World of Choices Across Our Most Popular</span>
 
           <div className="col-12">
             {/* Nav Tabs */}

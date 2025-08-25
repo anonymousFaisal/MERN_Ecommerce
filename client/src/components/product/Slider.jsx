@@ -27,20 +27,21 @@ const Slider = () => {
               );
             })}
           </div>
-          <div className="carousel-inner py-5">
+          <div className="carousel-inner py-4">
             {sliderList.map((item, index) => {
-              let active = "carousel-item";
-              if (index === 0) {
-                active = "carousel-item active";
-              }
+              const active = index === 0 ? "carousel-item active" : "carousel-item";
               return (
                 <div key={index} className={active} data-bs-interval="10000">
                   <div className="container">
                     <div className="row justify-content-center">
                       <div className="col-12 col-lg-5 col-sm-12 col-md-5 p-5">
-                        <h1 className="headline-1">{item.title}</h1>
-                        <p className="bodySmal my-5">{item.des}</p>
-                        <Link to="" className="btn text-white btn-dark btn-outline-success px-5">
+                        <h1 className="display-4 fw-bold text-white">{item.title}</h1>
+                        <h2 className="h2 fw-semibold  mt-2">{item.price}</h2>
+                        <p className="bodyMedium my-5">{item.des}</p>
+                        <Link
+                          to={`/details/${item.productID}`}
+                          className="btn btn-lg rounded-pill shadow text-white btn-dark btn-outline-success px-5"
+                        >
                           Buy Now
                         </Link>
                       </div>
