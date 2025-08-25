@@ -29,12 +29,32 @@ const useCartStore = create((set) => ({
 
   cartList: null,
   cartCount: 0,
+  cartTotal: 0,
+  cartVatTotal: 0,
+  cartPayableTotal: 0,
   resetCart: () => set({ cartList: null, cartCount: 0 }),
   fetchCartList: async () => {
     try {
       const res = await axios.get(`/api/v1/CartList`);
       const list = res?.data?.data || [];
       set({ cartList: list, cartCount: list.length });
+      let total = 0;
+      let vat = 0;
+      let payable = 0;
+      res.data.data.forEach((item) => {
+        if (item.product.discount) {
+          total += parseInt(item.product.discountPrice) * parseInt(item.qty);
+        } else {
+          total += parseInt(item.product.price) * parseInt(item.qty);
+        }
+        vat = total * 0.05;
+        payable = total + vat;
+      });
+      set({
+        cartTotal: total,
+        cartVatTotal: vat,
+        cartPayableTotal: payable,
+      });
     } catch (e) {
       const status = e?.response?.status;
       if (status === 401) {
@@ -42,6 +62,16 @@ const useCartStore = create((set) => ({
         return;
       }
       unauthorized(status);
+    }
+  },
+  fetchRemoveCart: async (cartID, productID) => {
+    try {
+      set({ cartList: null });
+      const res = await axios.post(`/api/v1/RemoveCartList`, { cartID, productID });
+      return res?.data?.status === "success";
+    } catch (e) {
+      unauthorized(e?.response?.status);
+      return false;
     }
   },
 }));
