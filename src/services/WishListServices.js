@@ -29,14 +29,9 @@ const WishListService = async (user_ID) => {
       $project: {
         _id: 0,
         userID: 0,
-        productID: 0,
         createdAt: 0,
         updatedAt: 0,
         "product._id": 0,
-        "product.brandID": 0,
-        "product.categoryID": 0,
-        "brand._id": 0,
-        "category._id": 0,
       },
     };
 
