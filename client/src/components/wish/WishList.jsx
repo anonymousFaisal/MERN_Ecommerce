@@ -4,9 +4,11 @@ import Rating from "@mui/material/Rating";
 import useWishStore from "../../store/useWishStore";
 import ProductsSkeleton from "../../skeleton/ProductsSkeleton";
 import NoData from "../layout/NoData";
+import useUserStore from "../../store/useUserStore";
 
 const WishList = () => {
   const { wishList, fetchWishList, fetchRemoveWish } = useWishStore();
+  const { isLoggedIn } = useUserStore();
 
   useEffect(() => {
     (async () => {
@@ -18,7 +20,22 @@ const WishList = () => {
     await fetchRemoveWish(productID);
     await fetchWishList();
   };
-  if (wishList === null) {
+  if (!isLoggedIn) {
+    return (
+      <div className="container mt-3 text-center">
+        <NoData />
+        <div className="card rounded-5 shadow-sm border-0 mt-4 mx-auto" style={{ maxWidth: "500px" }}>
+          <div className="card-body text-center p-4">
+            <h4 className="text-danger mb-3">Please login</h4>
+            <p className="text-muted mb-4">You need to login to add items to your wishlist.</p>
+            <Link to="/login" className="btn btn-success btn-xl px-4">
+              Login Now
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  } else if (wishList === null) {
     return <ProductsSkeleton />;
   } else if (wishList.length === 0) {
     return <NoData />;
