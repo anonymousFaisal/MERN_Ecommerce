@@ -87,6 +87,28 @@ const useCartStore = create((set) => ({
       set({ isCartSubmit: false });
     }
   },
+  invoiceList: null,
+  fetchInvoiceList: async () => {
+    try {
+      const res = await axios.get(`/api/v1/InvoiceList`);
+      const list = res?.data?.data || [];
+      set({ invoiceList: list });
+    } catch (e) {
+      const status = e?.response?.status;
+      unauthorized(status);
+    }
+  },
+  invoiceDetails: null,
+  fetchInvoiceDetails: async (invoiceID) => {
+    try {
+      const res = await axios.get(`/api/v1/InvoiceProductList/${invoiceID}`);
+      const list = res?.data?.data || null;
+      set({ invoiceDetails: list });
+    } catch (e) {
+      const status = e?.response?.status;
+      unauthorized(status);
+    }
+  },
 }));
 
 export default useCartStore;

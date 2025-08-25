@@ -17,6 +17,8 @@ import OtpPage from "./pages/OtpPage";
 import ProfilePage from "./pages/ProfilePage";
 import WishPage from "./pages/WishPage";
 import CartPage from "./pages/CartPage";
+import OrderPage from "./pages/OrderPage";
+import InvoicePage from "./pages/InvoicePage";
 
 // Main App component
 
@@ -50,6 +52,10 @@ const App = () => {
         {/* Wish and Cart */}
         <Route path="/wish" element={<WishPage />} />
         <Route path="/cart" element={<CartPage />} />
+
+        {/* Order Page /> */}
+        <Route path="/order" element={<OrderPage />} />
+        <Route path="/invoice/:invoiceID" element={<InvoicePage />} />
       </Routes>
     </BrowserRouter>
   );

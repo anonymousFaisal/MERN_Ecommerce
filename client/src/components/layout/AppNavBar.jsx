@@ -152,6 +152,20 @@ const AppNavBar = () => {
                   )}
                 </NavLink>
               </li>
+              <li className="nav-item">
+                <NavLink
+                  to="/order"
+                  aria-label="Orders"
+                  className={({ isActive }) =>
+                    `btn position-relative d-inline-flex align-items-center rounded-3 px-3 py-2 ${
+                      isActive ? "btn-success text-white" : "btn-light text-dark border"
+                    }`
+                  }
+                >
+                  <i className="bi bi-box-seam me-2"></i>
+                  Orders
+                </NavLink>
+              </li>
             </ul>
 
             {/* Search + actions */}
