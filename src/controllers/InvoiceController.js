@@ -1,4 +1,3 @@
-
 const {
   CreateInvoiceService,
   PaymentFailService,
@@ -26,42 +25,41 @@ exports.CreateInvoice = async (req, res) => {
 
 exports.PaymentSuccess = async (req, res) => {
   try {
-    const trxID = req.params.trxID; // <-- fix implicit global
+    trxID = req.params.trxID;
     const result = await PaymentSuccessService(trxID);
-
-    if (result.status === "success") {
-      return res.redirect(302, `${process.env.FRONTEND_URL}/payment/success/${trxID}`);
-    }
-    return res.redirect(302, `${process.env.FRONTEND_URL}/payment/fail/${trxID}`);
+    const code = result.status === "success" ? 200 : 400;
+    return res.status(code).json(result);
   } catch (error) {
-    return res.redirect(302, `${process.env.FRONTEND_URL || "/"}/payment/fail/${req.params.trxID}`);
+    return res.status(500).json({ status: "error", message: error.message });
   }
 };
 
 exports.PaymentFail = async (req, res) => {
   try {
-    const trxID = req.params.trxID;
-    await PaymentFailService(trxID);
-    return res.redirect(302, `${process.env.FRONTEND_URL}/payment/fail/${trxID}`);
+    trxID = req.params.trxID;
+    const result = await PaymentFailService(trxID);
+    const code = result.status === "success" ? 200 : 400;
+    return res.status(code).json(result);
   } catch (error) {
-    return res.redirect(302, `${process.env.FRONTEND_URL || "/"}/payment/fail/${req.params.trxID}`);
+    return res.status(500).json({ status: "error", message: error.message });
   }
 };
 
 exports.PaymentCancel = async (req, res) => {
   try {
-    const trxID = req.params.trxID;
-    await PaymentCancelService(trxID);
-    return res.redirect(302, `${process.env.FRONTEND_URL}/payment/cancel/${trxID}`);
+    trxID = req.params.trxID;
+    const result = await PaymentCancelService(trxID);
+    const code = result.status === "success" ? 200 : 400;
+    return res.status(code).json(result);
   } catch (error) {
-    return res.redirect(302, `${process.env.FRONTEND_URL || "/"}/payment/cancel/${req.params.trxID}`);
+    return res.status(500).json({ status: "error", message: error.message });
   }
 };
 
 exports.PaymentIPN = async (req, res) => {
   try {
-    const trxID = req.params.trxID;
-    const sslStatus = req.body.status;
+    trxID = req.params.trxID;
+    let sslStatus = req.body.status;
     const result = await PaymentIPNService(trxID, sslStatus);
     const code = result.status === "success" ? 200 : 400;
     return res.status(code).json(result);
