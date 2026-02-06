@@ -2,10 +2,14 @@ const nodemailer = require("nodemailer");
 
 const EmailSent = async (emailTo, emailText, emailSubject) => {
   const transport = nodemailer.createTransport({
-    host: "mail.teamrabbil.com",
-    port: 587,                 
-    secure: false,             
-    auth: { user: "info@teamrabbil.com", pass: "~sR4[bhaC[Qs" },
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    secure: process.env.EMAIL_SECURITY === "true",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+    tls: { rejectUnauthorized: false },
   });
 
   const mailOptions = {
