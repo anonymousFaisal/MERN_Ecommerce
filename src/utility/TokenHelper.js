@@ -11,10 +11,6 @@ exports.EncodeToken = (email, userID) => {
 };
 
 exports.DecodeToken = (token) => {
-  try {
-    const Key = process.env.JWT_SECRET_KEY;
-    return jwt.verify(token, Key);
-  } catch (error) {
-    throw new Error("Invalid or expired token");
-  }
+  const Key = process.env.JWT_SECRET_KEY;
+  return jwt.verify(token, Key);
 };

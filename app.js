@@ -14,9 +14,7 @@ const path = require("path");
 const { xss } = require("express-xss-sanitizer");
 const cookieParser = require("cookie-parser");
 
-// Database Import
-const connectDB = require("./src/config/db");
-
+const config = require("./src/config/config");
 // Security Middlewares
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -24,7 +22,12 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 app.use(helmet());
-app.use(cors());
+app.use(
+  cors({
+    origin: config.corsOrigin,
+    credentials: true,
+  }),
+);
 app.use(mongoSanitize());
 app.use(hpp());
 app.use(xss());
