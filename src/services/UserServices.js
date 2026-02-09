@@ -21,8 +21,9 @@ const UserOTPService = async (req) => {
     if (!mail || mail.status !== "success") {
       return { status: "fail", message: "Failed to send OTP email" };
     }
-    // save OTP
-    await UserModel.updateOne({ email }, { $set: { otp: code } }, { upsert: true });
+    // save OTP with 5 min expiration
+    const expires = Date.now() + 5 * 60 * 1000; // 5 minutes
+    await UserModel.updateOne({ email }, { $set: { otp: code, otpExpires: expires } }, { upsert: true });
 
     return { status: "success", message: "OTP sent successfully" };
   } catch (error) {
@@ -32,10 +33,19 @@ const UserOTPService = async (req) => {
 
 const VerifyOTPService = async ({ email, otp }) => {
   try {
-    const user = await UserModel.findOneAndUpdate({ email, otp }, { $unset: { otp: "" } }, { new: false, projection: { _id: 1, email: 1 } });
+    const user = await UserModel.findOne({ email, otp });
+
     if (!user) {
-      return { status: "fail", message: "Invalid or expired OTP" };
+      return { status: "fail", message: "Invalid OTP" };
     }
+
+    if (user.otpExpires && user.otpExpires < Date.now()) {
+      return { status: "fail", message: "OTP has expired" };
+    }
+
+    // Clear OTP and Expiry
+    await UserModel.updateOne({ _id: user._id }, { $unset: { otp: "", otpExpires: "" } });
+
     const token = EncodeToken(user.email, user._id.toString());
     return { status: "success", message: "OTP verified", token };
   } catch (error) {

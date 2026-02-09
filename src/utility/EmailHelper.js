@@ -1,28 +1,22 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
+const config = require("../config/config");
+
+const resend = new Resend(config.email.resendApiKey);
 
 const EmailSent = async (emailTo, emailText, emailSubject) => {
-  const transport = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
-    secure: process.env.EMAIL_SECURITY === "true",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-    tls: { rejectUnauthorized: false },
-  });
-
-  const mailOptions = {
-    from: "MERN Ecommerce Solution <info@teamrabbil.com>",
-    to: emailTo,
-    subject: emailSubject,
-    text: emailText,
-    envelope: { from: "info@teamrabbil.com", to: emailTo },
-  };
-
   try {
-    const info = await transport.sendMail(mailOptions);
-    return { status: "success", message: "Email sent successfully", info };
+    const { data, error } = await resend.emails.send({
+      from: config.email.from,
+      to: emailTo,
+      subject: emailSubject,
+      text: emailText,
+    });
+
+    if (error) {
+      return { status: "error", message: error.message };
+    }
+
+    return { status: "success", message: "Email sent successfully", info: data };
   } catch (error) {
     return { status: "error", message: error.message };
   }
