@@ -15,6 +15,7 @@ const { xss } = require("express-xss-sanitizer");
 const cookieParser = require("cookie-parser");
 
 const config = require("./src/config/config");
+const connectDB = require("./src/config/db");
 // Security Middlewares
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
