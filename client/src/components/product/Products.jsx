@@ -1,20 +1,15 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Rating from "@mui/material/Rating";
-import useProductStore from "../../store/useProductStore";
+import { useGetProductListByRemarkQuery } from "../../redux/features/productApi";
 import ProductsSkeleton from "../../skeleton/ProductsSkeleton";
 
 const Products = () => {
-  const { listByRemark, fetchListByRemark } = useProductStore();
+  const [remark, setRemark] = useState("new");
+  const { data: listByRemark, isFetching } = useGetProductListByRemarkQuery(remark);
 
-  // Load default "new" products on first render
-  useEffect(() => {
-    fetchListByRemark("new");
-  }, [fetchListByRemark]);
-
-  // one renderer for all tabs
   const renderProducts = () => {
-    if (listByRemark === null) return <ProductsSkeleton />;
+    if (isFetching || !listByRemark) return <ProductsSkeleton />;
 
     if (!Array.isArray(listByRemark) || listByRemark.length === 0) {
       return <div className="col-12 py-5 text-center text-muted">No products found.</div>;
@@ -45,6 +40,8 @@ const Products = () => {
     });
   };
 
+  const tabs = ["new", "trending", "popular", "top", "special"];
+
   return (
     <div className="section">
       <div className="container-fluid py-5 bg-light">
@@ -55,85 +52,18 @@ const Products = () => {
           <div className="col-12">
             {/* Nav Tabs */}
             <ul className="nav nav-pills p-3 justify-content-center mb-3" id="pills-tab" role="tablist">
-              <li className="nav-item" role="presentation">
-                <button
-                  onClick={() => fetchListByRemark("new")}
-                  className="nav-link active"
-                  id="pills-new-tab"
-                  data-bs-toggle="pill"
-                  data-bs-target="#pills-new"
-                  type="button"
-                  role="tab"
-                  aria-controls="pills-new"
-                  aria-selected="true"
-                >
-                  New
-                </button>
-              </li>
-
-              <li className="nav-item" role="presentation">
-                <button
-                  onClick={() => fetchListByRemark("trending")}
-                  className="nav-link"
-                  id="pills-trending-tab"
-                  data-bs-toggle="pill"
-                  data-bs-target="#pills-trending"
-                  type="button"
-                  role="tab"
-                  aria-controls="pills-trending"
-                  aria-selected="false"
-                >
-                  Trending
-                </button>
-              </li>
-
-              <li className="nav-item" role="presentation">
-                <button
-                  onClick={() => fetchListByRemark("popular")}
-                  className="nav-link"
-                  id="pills-popular-tab"
-                  data-bs-toggle="pill"
-                  data-bs-target="#pills-popular"
-                  type="button"
-                  role="tab"
-                  aria-controls="pills-popular"
-                  aria-selected="false"
-                >
-                  Popular
-                </button>
-              </li>
-
-              <li className="nav-item" role="presentation">
-                <button
-                  onClick={() => fetchListByRemark("top")}
-                  className="nav-link"
-                  id="pills-top-tab"
-                  data-bs-toggle="pill"
-                  data-bs-target="#pills-top"
-                  type="button"
-                  role="tab"
-                  aria-controls="pills-top"
-                  aria-selected="false"
-                >
-                  Top
-                </button>
-              </li>
-
-              <li className="nav-item" role="presentation">
-                <button
-                  onClick={() => fetchListByRemark("special")}
-                  className="nav-link"
-                  id="pills-special-tab"
-                  data-bs-toggle="pill"
-                  data-bs-target="#pills-special"
-                  type="button"
-                  role="tab"
-                  aria-controls="pills-special"
-                  aria-selected="false"
-                >
-                  Special
-                </button>
-              </li>
+              {tabs.map((tab) => (
+                <li className="nav-item" role="presentation" key={tab}>
+                  <button
+                    onClick={() => setRemark(tab)}
+                    className={`nav-link text-capitalize ${remark === tab ? "active" : ""}`}
+                    type="button"
+                    role="tab"
+                  >
+                    {tab}
+                  </button>
+                </li>
+              ))}
             </ul>
 
             {/* Tab Content */}

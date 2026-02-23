@@ -1,21 +1,22 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
+import { useParams } from "react-router-dom";
 import parse from "html-react-parser";
 import ProductImages from "./ProductImages";
-import useProductStore from "../../store/useProductStore";
+import { useGetProductDetailsQuery } from "../../redux/features/productApi";
 import ProductDetailSkeleton from "../../skeleton/ProductDetailSkeleton";
 import Reviews from "./Reviews";
 import CartSubmitButton from "./../cart/CartSubmitButton";
 import useCartStore from "../../store/useCartStore";
 import toast from "react-hot-toast";
 import useWishStore from "../../store/useWishStore";
-import WishSubmitButton from './../wish/WishSubmitButton';
+import WishSubmitButton from "./../wish/WishSubmitButton";
 
 const Details = () => {
-  const { details } = useProductStore();
+  const { productID } = useParams();
+  const { data: details, isLoading } = useGetProductDetailsQuery(productID);
   const [Quantity, setQuantity] = useState(1);
   const { cartForm, cartFormOnChange, fetchCartList, fetchCartCreate } = useCartStore();
-  const {fetchWishCreate, fetchWishList } = useWishStore();
+  const { fetchWishCreate, fetchWishList } = useWishStore();
   const increment = () => {
     setQuantity((prev) => {
       const newVal = prev + 1;
@@ -47,7 +48,7 @@ const Details = () => {
     }
   };
 
-  if (details === null) {
+  if (isLoading || !details) {
     return <ProductDetailSkeleton />;
   } else {
     return (

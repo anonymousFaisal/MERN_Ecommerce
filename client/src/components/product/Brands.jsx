@@ -1,12 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import useProductStore from "../../store/useProductStore";
+import { useGetBrandListQuery } from "../../redux/features/productApi";
 import BrandsSkeleton from "./../../skeleton/BrandsSkeleton";
 
 const Brands = () => {
-  const { brandList } = useProductStore();
+  const { data: brandList, isLoading } = useGetBrandListQuery();
 
-  if (brandList === null) {
+  if (isLoading || !brandList) {
     return <BrandsSkeleton />;
   } else {
     return (

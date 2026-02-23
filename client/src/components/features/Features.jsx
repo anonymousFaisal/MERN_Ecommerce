@@ -1,11 +1,11 @@
 import React from "react";
-import useFeatureStore from "../../store/useFeatureStore";
+import { useGetFeaturesListQuery } from "../../redux/features/featureApi";
 import FeaturesSkeleton from "../../skeleton/FeaturesSkeleton";
 
 const Features = () => {
-  const { featuresList } = useFeatureStore();
+  const { data: featuresList, isLoading } = useGetFeaturesListQuery();
 
-  if (featuresList === null) {
+  if (isLoading || !featuresList) {
     return <FeaturesSkeleton />;
   }
 

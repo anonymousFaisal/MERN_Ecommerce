@@ -1,12 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import useProductStore from "../../store/useProductStore";
+import { useGetSliderListQuery } from "../../redux/features/productApi";
 import SliderSkeleton from "./../../skeleton/SliderSkeleton";
 
 const Slider = () => {
-  const { sliderList } = useProductStore();
+  const { data: sliderList, isLoading } = useGetSliderListQuery();
 
-  if (sliderList === null) {
+  if (isLoading || !sliderList) {
     return <SliderSkeleton />;
   } else {
     return (

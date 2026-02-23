@@ -1,12 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import useProductStore from "../../store/useProductStore";
+import { useGetCategoryListQuery } from "../../redux/features/productApi";
 import CategoriesSkeleton from "./../../skeleton/CategoriesSkeleton";
 
 const Categories = () => {
-  const { categoryList } = useProductStore();
+  const { data: categoryList, isLoading } = useGetCategoryListQuery();
 
-  if (categoryList === null) {
+  if (isLoading || !categoryList) {
     return <CategoriesSkeleton />;
   } else {
     return (

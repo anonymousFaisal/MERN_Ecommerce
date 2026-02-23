@@ -1,12 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import Rating from "@mui/material/Rating";
-import useProductStore from "../../store/useProductStore";
+import { useGetBrandListQuery, useGetCategoryListQuery, useGetProductListByFilterMutation } from "../../redux/features/productApi";
 import ProductsSkeleton from "../../skeleton/ProductsSkeleton";
 import NoData from "../layout/NoData";
 
-const ProductList = () => {
-  const { listProduct, brandList, categoryList, fetchBrands, fetchCategories, fetchListByFilter } = useProductStore();
+const ProductList = ({ defaultProducts, defaultFetching }) => {
+  const { data: brandList } = useGetBrandListQuery();
+  const { data: categoryList } = useGetCategoryListQuery();
+  const [fetchFilteredProducts, { data: filteredProducts, isLoading: isFilterLoading }] = useGetProductListByFilterMutation();
 
   const [filter, setFilter] = useState({
     brandID: "",
@@ -15,21 +17,22 @@ const ProductList = () => {
     priceMax: 100000,
   });
 
+  const [isFiltering, setIsFiltering] = useState(false);
+
   const inputOnChange = (name, value) => {
     setFilter((prev) => ({ ...prev, [name]: value }));
   };
 
-  // fetch brands/categories once, refetch products when filter changes
   useEffect(() => {
-    if (!brandList) fetchBrands();
-    if (!categoryList) fetchCategories();
+    // priceMax is initialized to 100000 and priceMin to 0, so they are not empty strings.
+    // We should check if they deviate from defaults or if brand/category are set.
+    const isFilterActive = filter.brandID !== "" || filter.categoryID !== "" || filter.priceMin > 0 || filter.priceMax < 100000;
 
-    const isEveryFilterEmpty = Object.values(filter).every((v) => v === "");
-    if (!isEveryFilterEmpty) {
-      fetchListByFilter(filter);
+    if (isFilterActive) {
+      setIsFiltering(true);
+      fetchFilteredProducts(filter);
     } else {
-      // optionally fetch all products here
-      // fetchListByFilter({});
+      setIsFiltering(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
@@ -77,23 +80,24 @@ const ProductList = () => {
     );
   };
 
-  const productsArea = useMemo(() => {
-    if (listProduct === null) return <ProductsSkeleton />;
+  const activeProducts = isFiltering ? filteredProducts : defaultProducts;
+  const activeFetching = isFiltering ? isFilterLoading : defaultFetching;
 
-    if (!Array.isArray(listProduct) || listProduct.length === 0) {
-      return (
-        <NoData/>
-      );
+  const productsArea = useMemo(() => {
+    if (activeFetching || !activeProducts) return <ProductsSkeleton />;
+
+    if (!Array.isArray(activeProducts) || activeProducts.length === 0) {
+      return <NoData />;
     }
 
     return (
       <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
-        {listProduct.map((item) => (
+        {activeProducts.map((item) => (
           <ProductCard key={item._id} item={item} />
         ))}
       </div>
     );
-  }, [listProduct]);
+  }, [activeProducts, activeFetching]);
 
   return (
     <div className="container py-3">
@@ -180,9 +184,7 @@ const ProductList = () => {
         </div>
 
         {/* Products */}
-        <div className="col-md-9">
-          {productsArea}
-        </div>
+        <div className="col-md-9">{productsArea}</div>
       </div>
     </div>
   );
