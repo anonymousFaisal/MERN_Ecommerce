@@ -1,21 +1,13 @@
-const {FeatureListServices, LegalDetailService} = require("../services/FeatureServices");
+const { FeatureListServices, LegalDetailService } = require("../services/FeatureServices");
+const asyncHandler = require("../utility/asyncHandler");
 
+exports.FeatureList = asyncHandler(async (req, res) => {
+  const featureList = await FeatureListServices();
+  return res.status(200).json(featureList);
+});
 
-exports.FeatureList = async (req, res) => {
-    try {
-        const featureList = await FeatureListServices();
-        return res.status(200).json(featureList);
-    } catch (error) {
-        return res.status(500).json({ status: "error", message: error.message });
-    }
-};
-
-exports.LegalDetails = async (req, res) => {
-    try {
-        const type = (req.params.type);
-        const legalDetail = await LegalDetailService( type );
-        return res.status(200).json(legalDetail);
-    } catch (error) {
-        return res.status(500).json({ status: "error", message: error.message });
-    }
-};
+exports.LegalDetails = asyncHandler(async (req, res) => {
+  const type = req.params.type;
+  const legalDetail = await LegalDetailService(type);
+  return res.status(200).json(legalDetail);
+});

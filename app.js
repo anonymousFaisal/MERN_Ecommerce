@@ -14,9 +14,8 @@ const path = require("path");
 const { xss } = require("express-xss-sanitizer");
 const cookieParser = require("cookie-parser");
 
-// Database Import
-const mongoose = require("mongoose");
-
+const config = require("./src/config/config");
+const connectDB = require("./src/config/db");
 // Security Middlewares
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -24,7 +23,12 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 app.use(helmet());
-app.use(cors());
+app.use(
+  cors({
+    origin: config.corsOrigin,
+    credentials: true,
+  }),
+);
 app.use(mongoSanitize());
 app.use(hpp());
 app.use(xss());
@@ -34,15 +38,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // MongoDB Database Connection
-let URI = process.env.MONGODB_URI;
-mongoose
-  .connect(URI, {
-    user: process.env.DB_USER || "",
-    pass: process.env.DB_PASS || "",
-    autoIndex: true,
-  })
-  .then(() => console.log(`✅ MongoDB Connected: ${URI}`))
-  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
+// Connect to Database
+connectDB();
 
 // Routes
 app.use("/api/v1", router);
