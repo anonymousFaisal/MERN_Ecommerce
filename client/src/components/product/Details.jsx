@@ -6,17 +6,21 @@ import { useGetProductDetailsQuery } from "../../redux/features/productApi";
 import ProductDetailSkeleton from "../../skeleton/ProductDetailSkeleton";
 import Reviews from "./Reviews";
 import CartSubmitButton from "./../cart/CartSubmitButton";
-import useCartStore from "../../store/useCartStore";
 import toast from "react-hot-toast";
-import useWishStore from "../../store/useWishStore";
 import WishSubmitButton from "./../wish/WishSubmitButton";
+import { useCreateCartItemMutation } from "../../redux/features/cartApi";
+import { useCreateWishItemMutation } from "../../redux/features/wishApi";
 
 const Details = () => {
   const { productID } = useParams();
   const { data: details, isLoading } = useGetProductDetailsQuery(productID);
+
+  const [cartForm, setCartForm] = useState({ color: "", qty: 1, size: "" });
+  const cartFormOnChange = (name, value) => {
+    setCartForm((prev) => ({ ...prev, [name]: value }));
+  };
+
   const [Quantity, setQuantity] = useState(1);
-  const { cartForm, cartFormOnChange, fetchCartList, fetchCartCreate } = useCartStore();
-  const { fetchWishCreate, fetchWishList } = useWishStore();
   const increment = () => {
     setQuantity((prev) => {
       const newVal = prev + 1;
@@ -33,18 +37,30 @@ const Details = () => {
     });
   };
 
+  const [createCartItem, { isLoading: isCartAdding }] = useCreateCartItemMutation();
+  const [createWishItem, { isLoading: isWishAdding }] = useCreateWishItemMutation();
+
   const addToCart = async (productID) => {
-    let res = await fetchCartCreate(cartForm, productID);
-    if (res) {
-      toast.success("Product added to cart successfully");
-      await fetchCartList();
+    try {
+      const res = await createCartItem({ ...cartForm, productID }).unwrap();
+      if (res?.status === "success") {
+        toast.success("Product added to cart successfully");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to add product to cart");
     }
   };
+
   const addToWish = async (productID) => {
-    let res = await fetchWishCreate(productID);
-    if (res) {
-      toast.success("Product added to wishlist successfully");
-      await fetchWishList();
+    try {
+      const res = await createWishItem({ productID }).unwrap();
+      if (res?.status === "success") {
+        toast.success("Product added to wishlist successfully");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to add product to wishlist");
     }
   };
 
@@ -56,7 +72,7 @@ const Details = () => {
         <div className="container mt-2">
           <div className="row">
             <div className="col-md-7 p-3">
-              <ProductImages />
+              <ProductImages details={details} />
             </div>
             <div className="col-md-5 p-3">
               <h4>{details.title}</h4>
@@ -112,10 +128,20 @@ const Details = () => {
                   </div>
                 </div>
                 <div className="col-4 p-2">
-                  <CartSubmitButton className="btn w-100 btn-success" onClick={async () => await addToCart(details._id)} text="Add to Cart" />
+                  <CartSubmitButton
+                    submit={isCartAdding}
+                    className="btn w-100 btn-success"
+                    onClick={() => addToCart(details._id)}
+                    text="Add to Cart"
+                  />
                 </div>
                 <div className="col-4 p-2">
-                  <WishSubmitButton className="btn w-100 btn-success" onClick={async () => await addToWish(details._id)} text="Add to Wishlist" />
+                  <WishSubmitButton
+                    submit={isWishAdding}
+                    className="btn w-100 btn-success"
+                    onClick={() => addToWish(details._id)}
+                    text="Add to Wishlist"
+                  />
                 </div>
               </div>
             </div>

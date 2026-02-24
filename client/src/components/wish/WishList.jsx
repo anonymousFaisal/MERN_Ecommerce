@@ -1,28 +1,29 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import Rating from "@mui/material/Rating";
 import ProductsSkeleton from "../../skeleton/ProductsSkeleton";
-import useWishStore from "../../store/useWishStore";
 import NoData from "../layout/NoData";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import { useGetWishListQuery, useRemoveWishItemMutation } from "../../redux/features/wishApi";
 
 const WishList = () => {
-  const { wishList, fetchWishList, fetchRemoveWish } = useWishStore();
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
-
-  useEffect(() => {
-    (async () => {
-      await fetchWishList();
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { data: wishList, isLoading: isWishLoading } = useGetWishListQuery(undefined, { skip: !isLoggedIn });
+  const [removeWishItem] = useRemoveWishItemMutation();
 
   const remove = async (productID) => {
-    await fetchRemoveWish(productID);
-    await fetchWishList();
-    toast.success("Product removed from wishlist");
+    try {
+      const res = await removeWishItem({ productID }).unwrap();
+      if (res?.status === "success") {
+        toast.success("Product removed from wishlist");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to remove product from wishlist");
+    }
   };
+
   if (!isLoggedIn) {
     return (
       <div className="container mt-3 text-center">
@@ -30,7 +31,7 @@ const WishList = () => {
         <div className="card rounded-5 shadow-sm border-0 mt-4 mx-auto" style={{ maxWidth: "500px" }}>
           <div className="card-body text-center p-4">
             <h4 className="text-danger mb-3">Please login</h4>
-            <p className="text-muted mb-4">You need to login to add items to your wishlist.</p>
+            <p className="text-muted mb-4">You need to login to view your wishlist.</p>
             <Link to="/login" className="btn btn-success btn-xl px-4">
               Login Now
             </Link>
@@ -38,7 +39,7 @@ const WishList = () => {
         </div>
       </div>
     );
-  } else if (wishList === null) {
+  } else if (isWishLoading || !wishList) {
     return <ProductsSkeleton />;
   } else if (wishList.length === 0) {
     return <NoData />;
@@ -68,12 +69,7 @@ const WishList = () => {
                     <Rating value={Number.parseFloat(item?.product.star ?? 0) || 0} readOnly size="medium" precision={0.5} />
 
                     <p className="mt-3">
-                      <button
-                        onClick={async () => {
-                          await remove(item.productID);
-                        }}
-                        className="btn btn-outline-danger btn-sm"
-                      >
+                      <button onClick={() => remove(item.productID)} className="btn btn-outline-danger btn-sm">
                         Remove
                       </button>
                       <Link className="btn mx-2 btn-outline-success btn-sm" to={`/details/${item.productID}`}>

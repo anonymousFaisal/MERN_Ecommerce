@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import useCartStore from "../../store/useCartStore";
-import useReviewStore from "../../store/useReviewStore";
 import NoData from "../layout/NoData";
 import CartSkeleton from "../../skeleton/CartSkeleton";
 import Modal from "react-bootstrap/Modal";
@@ -9,12 +7,20 @@ import ReviewSubmitButton from "./ReviewSubmitButton";
 import ValidationHelper from "../../utility/ValidationHelper";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { useGetInvoiceDetailsQuery } from "../../redux/features/cartApi";
+import { useCreateReviewMutation } from "../../redux/features/reviewApi";
 
 const InvoiceDetails = () => {
   const { id: invoiceID } = useParams();
-  const { invoiceDetails, fetchInvoiceDetails } = useCartStore();
-  const { reviewFormData, reviewFormOnChange, fetchSaveReview } = useReviewStore();
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+
+  const { data: invoiceDetails, isLoading } = useGetInvoiceDetailsQuery(invoiceID, { skip: !isLoggedIn });
+  const [createReview, { isLoading: isReviewSubmit }] = useCreateReviewMutation();
+
+  const [reviewFormData, setReviewFormData] = useState({ des: "", rating: "5", productID: "" });
+  const reviewFormOnChange = (name, value) => {
+    setReviewFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -24,19 +30,23 @@ const InvoiceDetails = () => {
     reviewFormOnChange("productID", productID);
   };
 
-  useEffect(() => {
-    (async () => {
-      await fetchInvoiceDetails(invoiceID);
-    })();
-  }, [invoiceID, fetchInvoiceDetails]);
-
   const submitReview = async () => {
     if (ValidationHelper.IsEmpty(reviewFormData.des)) {
       toast.error("Review Required");
     } else {
-      let res = await fetchSaveReview(reviewFormData);
-      res ? toast.success("New Review Created") : toast.error("Something Went Wrong !");
-      setShow(false);
+      try {
+        const res = await createReview(reviewFormData).unwrap();
+        if (res?.status === "success") {
+          toast.success("New Review Created");
+          setShow(false);
+          setReviewFormData({ des: "", rating: "5", productID: "" });
+        } else {
+          toast.error("Something Went Wrong !");
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to submit review");
+      }
     }
   };
 
@@ -55,7 +65,7 @@ const InvoiceDetails = () => {
         </div>
       </div>
     );
-  } else if (invoiceDetails === null) {
+  } else if (isLoading || !invoiceDetails) {
     return <CartSkeleton />;
   } else if (invoiceDetails.length === 0) {
     return <NoData />;
@@ -109,7 +119,12 @@ const InvoiceDetails = () => {
                 </div>
                 <div className="col-12 p-2">
                   <label className="form-label">Review</label>
-                  <textarea onChange={(e) => reviewFormOnChange("des", e.target.value)} className="form-control" rows={7} />
+                  <textarea
+                    onChange={(e) => reviewFormOnChange("des", e.target.value)}
+                    className="form-control"
+                    rows={7}
+                    value={reviewFormData.des}
+                  />
                 </div>
               </div>
             </div>
@@ -118,7 +133,7 @@ const InvoiceDetails = () => {
             <button className="btn btn-dark" onClick={handleClose}>
               Close
             </button>
-            <ReviewSubmitButton text="Submit" className="btn btn-success" onClick={submitReview} />
+            <ReviewSubmitButton submit={isReviewSubmit} text="Submit" className="btn btn-success" onClick={submitReview} />
           </Modal.Footer>
         </Modal>
       </div>

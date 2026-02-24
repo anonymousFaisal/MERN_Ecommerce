@@ -1,10 +1,7 @@
 import React from "react";
-import useCartStore from './../../store/useCartStore';
 
 const CartSubmitButton = (props) => {
-  
-  let { isCartSubmit } = useCartStore();
-  if (isCartSubmit === false) {
+  if (props.submit === false || !props.submit) {
     return (
       <button onClick={props.onClick} type="submit" className={props.className}>
         {props.text}

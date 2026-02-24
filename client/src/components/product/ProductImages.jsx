@@ -1,10 +1,9 @@
 import React from "react";
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
-import useProductStore from "../../store/useProductStore";
 
-const ProductImage = () => {
-  const { details } = useProductStore();
+const ProductImage = ({ details }) => {
+  if (!details?.details) return null;
   let images = [
     { original: details.details.img1, thumbnail: details.details.img1 },
     { original: details.details.img2, thumbnail: details.details.img2 },

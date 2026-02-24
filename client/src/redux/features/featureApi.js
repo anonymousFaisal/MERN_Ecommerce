@@ -7,7 +7,12 @@ export const featureApi = baseApi.injectEndpoints({
       providesTags: ["Feature"],
       transformResponse: (response) => response.data,
     }),
+    getLegalDetails: builder.query({
+      query: (type) => `/LegalDetails/${type}`,
+      providesTags: ["Feature"],
+      transformResponse: (response) => response?.data?.[0] ?? null,
+    }),
   }),
 });
 
-export const { useGetFeaturesListQuery } = featureApi;
+export const { useGetFeaturesListQuery, useGetLegalDetailsQuery } = featureApi;

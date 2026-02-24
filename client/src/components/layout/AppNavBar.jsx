@@ -1,22 +1,26 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import logo from "../../assets/images/plainb-logo.svg";
-import useProductStore from "../../store/useProductStore";
 import UserSubmitButton from "../user/UserSubmitButton";
-import useCartStore from "../../store/useCartStore";
-import useWishStore from "../../store/useWishStore";
 import { setAuthStatus } from "../../redux/features/userSlice";
 import { useUserLogoutMutation } from "../../redux/features/userApi";
+import { useGetCartListQuery } from "../../redux/features/cartApi";
+import { useGetWishListQuery } from "../../redux/features/wishApi";
+import { baseApi } from "../../redux/api/baseApi";
 
 const AppNavBar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   const [userLogout, { isLoading: isLogoutLoading }] = useUserLogoutMutation();
-  const { searchQuery, setSearchQuery } = useProductStore();
-  const { cartCount, fetchCartList, resetCart } = useCartStore();
-  const { wishCount, fetchWishList, resetWish } = useWishStore();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const { data: cartData } = useGetCartListQuery(undefined, { skip: !isLoggedIn });
+  const { data: wishData } = useGetWishListQuery(undefined, { skip: !isLoggedIn });
+
+  const cartCount = cartData?.length || 0;
+  const wishCount = wishData?.length || 0;
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -33,20 +37,9 @@ const AppNavBar = () => {
     sessionStorage.clear();
     localStorage.clear();
     dispatch(setAuthStatus(false));
-    resetCart();
-    resetWish();
+    dispatch(baseApi.util.resetApiState());
     navigate("/");
   };
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      fetchCartList().catch(() => {});
-      fetchWishList().catch(() => {});
-    } else {
-      resetCart();
-      resetWish();
-    }
-  }, [isLoggedIn, fetchCartList, resetCart, fetchWishList, resetWish]);
 
   return (
     <>

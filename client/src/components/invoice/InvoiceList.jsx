@@ -1,19 +1,13 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import useCartStore from "../../store/useCartStore";
 import { useSelector } from "react-redux";
 import CartSkeleton from "../../skeleton/CartSkeleton";
 import NoData from "../layout/NoData";
+import { useGetInvoiceListQuery } from "../../redux/features/cartApi";
 
 const InvoiceList = () => {
-  const { invoiceList, fetchInvoiceList } = useCartStore();
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
-  useEffect(() => {
-    (async () => {
-      await fetchInvoiceList();
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { data: invoiceList, isLoading } = useGetInvoiceListQuery(undefined, { skip: !isLoggedIn });
 
   if (!isLoggedIn) {
     return (
@@ -30,7 +24,7 @@ const InvoiceList = () => {
         </div>
       </div>
     );
-  } else if (invoiceList === null) {
+  } else if (isLoading || !invoiceList) {
     return <CartSkeleton />;
   } else if (invoiceList.length === 0) {
     return <NoData />;
