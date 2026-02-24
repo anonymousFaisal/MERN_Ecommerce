@@ -1,21 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import useReviewStore from "../../store/useReviewStore";
+import { useParams, Link } from "react-router-dom";
 import useCartStore from "../../store/useCartStore";
-import { useParams } from "react-router-dom";
+import useReviewStore from "../../store/useReviewStore";
+import NoData from "../layout/NoData";
+import CartSkeleton from "../../skeleton/CartSkeleton";
+import Modal from "react-bootstrap/Modal";
+import ReviewSubmitButton from "./ReviewSubmitButton";
 import ValidationHelper from "../../utility/ValidationHelper";
 import toast from "react-hot-toast";
-import useUserStore from "../../store/useUserStore";
-import CartSkeleton from "../../skeleton/CartSkeleton";
-import NoData from "../layout/NoData";
-import { Modal } from "react-bootstrap";
-import ReviewSubmitButton from "./ReviewSubmitButton";
+import { useSelector } from "react-redux";
 
 const InvoiceDetails = () => {
-  let { reviewFormData, reviewFormOnChange, fetchSaveReview } = useReviewStore();
-  let { fetchInvoiceDetails, invoiceDetails } = useCartStore();
-  const { isLoggedIn } = useUserStore();
-  const { invoiceID } = useParams();
+  const { id: invoiceID } = useParams();
+  const { invoiceDetails, fetchInvoiceDetails } = useCartStore();
+  const { reviewFormData, reviewFormOnChange, fetchSaveReview } = useReviewStore();
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);

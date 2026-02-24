@@ -1,24 +1,32 @@
-import React from "react";
+import React, { useState } from "react";
 import UserSubmitButton from "./UserSubmitButton";
-import useUserStore from "../../store/useUserStore";
 import ValidationHelper from "./../../utility/ValidationHelper";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { useUserOtpMutation } from "../../redux/features/userApi";
+import { setEmail } from "../../utility/utility";
 
 const LoginForm = () => {
   let navigate = useNavigate();
-  const { loginFormData, loginFormOnChange, fetchUserOtp } = useUserStore();
+  const [email, setEmailState] = useState("");
+  const [userOtp, { isLoading }] = useUserOtpMutation();
+
   const onFormSubmit = async () => {
-    if (!ValidationHelper.IsEmail(loginFormData.email)) {
+    if (!ValidationHelper.IsEmail(email)) {
       toast.error("Please enter valid email address");
       return;
     } else {
-      const res = await fetchUserOtp(loginFormData.email);
-      if (res) {
-        toast.success("OTP sent successfully");
-        // navigate
-        navigate("/otp");
-      } else {
+      try {
+        const res = await userOtp(email).unwrap();
+        if (res?.status === "success") {
+          toast.success("OTP sent successfully");
+          setEmail(email);
+          navigate("/otp");
+        } else {
+          toast.error("Failed to send OTP. Please try again.");
+        }
+      } catch (err) {
+        console.error(err);
         toast.error("Failed to send OTP. Please try again.");
       }
     }
@@ -31,14 +39,8 @@ const LoginForm = () => {
           <div className="card p-5">
             <h4>Enter Your Email</h4>
             <p>A verification code will be sent to the email address you provide</p>
-            <input
-              value={loginFormData.email}
-              onChange={(e) => loginFormOnChange("email", e.target.value)}
-              placeholder="Email Address"
-              type="email"
-              className="form-control"
-            />
-            <UserSubmitButton onClick={onFormSubmit} className="btn mt-3 btn-success" text="Next" />
+            <input value={email} onChange={(e) => setEmailState(e.target.value)} placeholder="Email Address" type="email" className="form-control" />
+            <UserSubmitButton submit={isLoading} onClick={onFormSubmit} className="btn mt-3 btn-success" text="Next" />
           </div>
         </div>
       </div>

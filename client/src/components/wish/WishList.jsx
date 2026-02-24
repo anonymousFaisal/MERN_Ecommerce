@@ -1,21 +1,21 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import Rating from "@mui/material/Rating";
-import useWishStore from "../../store/useWishStore";
 import ProductsSkeleton from "../../skeleton/ProductsSkeleton";
+import useWishStore from "../../store/useWishStore";
 import NoData from "../layout/NoData";
-import useUserStore from "../../store/useUserStore";
+import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 
 const WishList = () => {
   const { wishList, fetchWishList, fetchRemoveWish } = useWishStore();
-  const { isLoggedIn } = useUserStore();
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 
   useEffect(() => {
     (async () => {
       await fetchWishList();
     })();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const remove = async (productID) => {

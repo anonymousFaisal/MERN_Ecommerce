@@ -1,23 +1,58 @@
-import React, { useEffect } from "react";
-import useUserStore from "../../store/useUserStore";
+import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import ProfileSkeleton from "./../../skeleton/ProfileSkeleton";
+import { useGetProfileDetailsQuery, useUpdateProfileMutation } from "../../redux/features/userApi";
+import UserSubmitButton from "./UserSubmitButton";
 
 const ProfileForm = () => {
-  const { profileFormOnChange, profileForm, profileDetails, fetchProfileDetails, fetchProfileUpdate } = useUserStore();
-  useEffect(() => {
-    (async () => await fetchProfileDetails())();
+  const { data: profileDetails, isLoading: isFetching, refetch } = useGetProfileDetailsQuery();
+  const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
 
+  const [profileForm, setProfileForm] = useState({
+    cus_add: "",
+    cus_city: "",
+    cus_country: "",
+    cus_fax: "",
+    cus_name: "",
+    cus_phone: "",
+    cus_postcode: "",
+    cus_state: "",
+    ship_add: "",
+    ship_city: "",
+    ship_country: "",
+    ship_name: "",
+    ship_phone: "",
+    ship_postcode: "",
+    ship_state: "",
+  });
+
+  useEffect(() => {
+    if (profileDetails) {
+      setProfileForm({ ...profileForm, ...profileDetails });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [profileDetails]);
+
+  const profileFormOnChange = (name, value) => {
+    setProfileForm((prev) => ({ ...prev, [name]: value }));
+  };
+
   const Save = async () => {
-    let res = await fetchProfileUpdate(profileForm);
-    if (res) {
-      toast.success("Profile Updated Successfully");
-      await fetchProfileDetails();
+    try {
+      const res = await updateProfile(profileForm).unwrap();
+      if (res?.status === "success") {
+        toast.success("Profile Updated Successfully");
+        refetch();
+      } else {
+        toast.error("Something went wrong");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong");
     }
   };
-  if (profileDetails === null) {
+
+  if (isFetching || profileDetails === undefined) {
     return <ProfileSkeleton />;
   } else {
     return (
@@ -173,9 +208,7 @@ const ProfileForm = () => {
           {/* Save Button */}
           <div className="row mt-3">
             <div className="col-md-3">
-              <button className="btn btn-success w-100" onClick={Save}>
-                Save
-              </button>
+              <UserSubmitButton submit={isUpdating} onClick={Save} text="Save" className="btn btn-success w-100" />
             </div>
           </div>
         </div>

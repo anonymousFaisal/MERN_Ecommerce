@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import useCartStore from "../../store/useCartStore";
 import { toast } from "react-hot-toast";
-import useUserStore from "../../store/useUserStore";
+import { useSelector } from "react-redux";
 import NoData from "../layout/NoData";
 import { Link } from "react-router-dom";
 import CartSkeleton from "../../skeleton/CartSkeleton";
@@ -9,7 +9,7 @@ import CartSubmitButton from "./CartSubmitButton";
 
 const CartList = () => {
   const { cartList, cartTotal, cartVatTotal, cartPayableTotal, fetchCartList, fetchRemoveCart, fetchCreateInvoice } = useCartStore();
-  const { isLoggedIn } = useUserStore();
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   useEffect(() => {
     (async () => {
       await fetchCartList();

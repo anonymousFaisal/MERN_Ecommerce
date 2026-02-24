@@ -1,14 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import useCartStore from "../../store/useCartStore";
-import { useEffect } from "react";
-import useUserStore from "../../store/useUserStore";
+import { useSelector } from "react-redux";
 import CartSkeleton from "../../skeleton/CartSkeleton";
 import NoData from "../layout/NoData";
 
 const InvoiceList = () => {
   const { invoiceList, fetchInvoiceList } = useCartStore();
-  const { isLoggedIn } = useUserStore();
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   useEffect(() => {
     (async () => {
       await fetchInvoiceList();

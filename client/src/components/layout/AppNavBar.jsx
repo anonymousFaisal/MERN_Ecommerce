@@ -1,15 +1,19 @@
 import React, { useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import logo from "../../assets/images/plainb-logo.svg";
 import useProductStore from "../../store/useProductStore";
-import useUserStore from "../../store/useUserStore";
 import UserSubmitButton from "../user/UserSubmitButton";
 import useCartStore from "../../store/useCartStore";
 import useWishStore from "../../store/useWishStore";
+import { setAuthStatus } from "../../redux/features/userSlice";
+import { useUserLogoutMutation } from "../../redux/features/userApi";
 
 const AppNavBar = () => {
   const navigate = useNavigate();
-  const { isLoggedIn, fetchUserLogout } = useUserStore();
+  const dispatch = useDispatch();
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const [userLogout, { isLoading: isLogoutLoading }] = useUserLogoutMutation();
   const { searchQuery, setSearchQuery } = useProductStore();
   const { cartCount, fetchCartList, resetCart } = useCartStore();
   const { wishCount, fetchWishList, resetWish } = useWishStore();
@@ -25,9 +29,10 @@ const AppNavBar = () => {
   };
 
   const onLogOut = async () => {
-    await fetchUserLogout();
+    await userLogout();
     sessionStorage.clear();
     localStorage.clear();
+    dispatch(setAuthStatus(false));
     resetCart();
     resetWish();
     navigate("/");
@@ -196,6 +201,7 @@ const AppNavBar = () => {
                   </NavLink>
 
                   <UserSubmitButton
+                    submit={isLogoutLoading}
                     onClick={onLogOut}
                     text="Logout"
                     className="btn btn-outline-dark rounded-3 d-inline-flex align-items-center px-3 py-2"
