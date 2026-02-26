@@ -3,7 +3,7 @@ import { baseApi } from "../api/baseApi";
 export const featureApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getFeaturesList: builder.query({
-      query: () => "/FeaturesList",
+      query: () => "/FeatureList",
       providesTags: ["Feature"],
       transformResponse: (response) => response.data,
     }),
