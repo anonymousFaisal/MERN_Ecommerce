@@ -29,31 +29,33 @@ This application recently underwent a massive **12-Phase UI & UX Overhaul**, tra
 
 Check out some of the beautifully overhauled UI interfaces.
 
-> **How to update these screenshots:**
->
-> 1. Take screenshots of your running application.
-> 2. Save them inside an `images/` folder in the root or just drag and drop the image file directly into github's markdown editor when editing this README.
-> 3. Replace the placeholder comment `<!-- url -->` inside the parenthesis below with the generated URL or relative path (e.g., `![Home Page](./images/home_screenshot.png)`).
-
 ### Home Page & Sliders
 
-![Home Page Overview](<!-- url -->)
+<img width="1911" height="911" alt="mern" src="https://github.com/user-attachments/assets/12169190-8623-44dd-b2ee-7eba09db40d5" />
+
 
 ### Product Details & Rich Descriptions
 
-![Product Details View](<!-- url -->)
+<img width="1920" height="915" alt="image" src="https://github.com/user-attachments/assets/0616d917-59be-4395-b0dd-a532facf3396" />
+
 
 ### Smart Filtering & Search Results
 
-![Search and Filtering](<!-- url -->)
+<img width="1918" height="911" alt="image" src="https://github.com/user-attachments/assets/212ec033-bf19-4d44-8894-f01bbc72dd35" />
+
 
 ### User Authentication (OTP Flow)
 
-![OTP Login Flow](<!-- url -->)
+<img width="1910" height="911" alt="image" src="https://github.com/user-attachments/assets/11b65b09-78f9-4dd9-81d6-3647963f7053" />
+<img width="1911" height="914" alt="image" src="https://github.com/user-attachments/assets/b2751190-87de-4ddc-a881-a0d862a50ed4" />
+
+
 
 ### Cart & Checkout System
 
-![Cart Summary View](<!-- url -->)
+<img width="1914" height="921" alt="image" src="https://github.com/user-attachments/assets/8cefc6fe-93f8-410b-bdd0-783745903ae0" />
+<img width="1909" height="903" alt="image" src="https://github.com/user-attachments/assets/b3aff930-0177-4e49-80ce-60ed219f3a66" />
+
 
 ---
 
