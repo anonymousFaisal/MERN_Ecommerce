@@ -32,11 +32,11 @@ const CartList = () => {
       if (res?.status === "success" && res?.data?.GatewayPageURL) {
         window.location.href = res?.data?.GatewayPageURL;
       } else {
-        toast.error("Failed to create checkout session");
+        toast.error(res?.message || "Failed to create checkout session");
       }
     } catch (err) {
       console.error(err);
-      toast.error("Failed to checkout");
+      toast.error(err?.data?.message || err?.message || "Failed to checkout");
     }
   };
 
