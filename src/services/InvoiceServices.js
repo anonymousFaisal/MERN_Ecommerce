@@ -54,7 +54,19 @@ const CreateInvoiceService = async ({ user_ID, email }) => {
     if (!profile) {
       return {
         status: "error",
-        message: "Profile not found. Complete profile first.",
+        message: "Profile not found. Please complete your profile first.",
+      };
+    }
+
+    // Validate required profile fields
+    const requiredFields = ["cus_name", "cus_add", "cus_city", "cus_phone", "ship_name", "ship_add", "ship_city", "ship_phone"];
+
+    const hasMissingFields = requiredFields.some((field) => !profile[field] || profile[field].trim() === "");
+
+    if (hasMissingFields) {
+      return {
+        status: "error",
+        message: "Please complete your profile details (Address, City, Phone) before checking out.",
       };
     }
 
@@ -83,7 +95,7 @@ const CreateInvoiceService = async ({ user_ID, email }) => {
               delivery_status: "pending",
             },
           ],
-          { session }
+          { session },
         );
 
         const invoiceID = invoice[0]._id;
@@ -99,7 +111,7 @@ const CreateInvoiceService = async ({ user_ID, email }) => {
             color: element.color,
             size: element.size,
           })),
-          { session }
+          { session },
         );
 
         // Clear cart
@@ -154,8 +166,13 @@ const CreateInvoiceService = async ({ user_ID, email }) => {
 
     const SSLRes = await axios.post(PaymentSettings[0].init_url, form);
 
+    if (SSLRes.data?.status !== "SUCCESS") {
+      return { status: "error", message: `Gateway Error: ${SSLRes.data?.failedreason || SSLRes.data?.message || JSON.stringify(SSLRes.data)}` };
+    }
+
     return { status: "success", data: SSLRes.data };
   } catch (error) {
+    console.error("SSL COMMERZ ERROR:", error?.response?.data || error.message);
     return { status: "error", message: error.message };
   }
 };
@@ -213,7 +230,7 @@ const InvoiceProductListService = async (user_ID, invoice_ID) => {
     let joinProductStage = { $lookup: { from: "products", localField: "productID", foreignField: "_id", as: "product" } };
     let unwindProductStage = { $unwind: { path: "$product" } };
     const data = await InvoiceProductModel.aggregate([matchStage, joinProductStage, unwindProductStage]);
-    return { status: "success" , data };
+    return { status: "success", data };
   } catch (error) {
     return { status: "error", message: error.message };
   }

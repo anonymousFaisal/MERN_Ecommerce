@@ -1,28 +1,31 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import Rating from "@mui/material/Rating";
-import useWishStore from "../../store/useWishStore";
 import ProductsSkeleton from "../../skeleton/ProductsSkeleton";
 import NoData from "../layout/NoData";
-import useUserStore from "../../store/useUserStore";
+import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import { useGetWishListQuery, useRemoveWishItemMutation } from "../../redux/features/wishApi";
 
 const WishList = () => {
-  const { wishList, fetchWishList, fetchRemoveWish } = useWishStore();
-  const { isLoggedIn } = useUserStore();
-
-  useEffect(() => {
-    (async () => {
-      await fetchWishList();
-    })();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const { data: wishList, isLoading: isWishLoading } = useGetWishListQuery(undefined, { skip: !isLoggedIn });
+  const [removeWishItem] = useRemoveWishItemMutation();
 
   const remove = async (productID) => {
-    await fetchRemoveWish(productID);
-    await fetchWishList();
-    toast.success("Product removed from wishlist");
+    try {
+      const res = await removeWishItem({ productID }).unwrap();
+      if (res?.status === "success") {
+        toast.success("Product removed from wishlist");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to remove product from wishlist");
+    }
   };
+
+  // Extract the array from API response: { status, data: [...] }
+  const items = Array.isArray(wishList) ? wishList : wishList?.data;
+
   if (!isLoggedIn) {
     return (
       <div className="container mt-3 text-center">
@@ -30,7 +33,7 @@ const WishList = () => {
         <div className="card rounded-5 shadow-sm border-0 mt-4 mx-auto" style={{ maxWidth: "500px" }}>
           <div className="card-body text-center p-4">
             <h4 className="text-danger mb-3">Please login</h4>
-            <p className="text-muted mb-4">You need to login to add items to your wishlist.</p>
+            <p className="text-muted mb-4">You need to login to view your wishlist.</p>
             <Link to="/login" className="btn btn-success btn-xl px-4">
               Login Now
             </Link>
@@ -38,48 +41,76 @@ const WishList = () => {
         </div>
       </div>
     );
-  } else if (wishList === null) {
+  } else if (isWishLoading || !items || !Array.isArray(items)) {
     return <ProductsSkeleton />;
-  } else if (wishList.length === 0) {
+  } else if (items.length === 0) {
     return <NoData />;
   } else {
     return (
       <div className="container mt-3">
         <div className="row">
-          {wishList.map((item, i) => {
-            let price = <p className="bodyMedium text-dark my-1">Price: ${item.product.price}</p>;
-
-            if (item.product.discount === true) {
-              price = (
-                <p className="bodyMedium text-dark my-1">
-                  Price:
-                  <strike> ${item.product.price} </strike> ${item.product.discountPrice}
-                </p>
-              );
-            }
-
+          {items.map((item, i) => {
+            if (!item?.product) return null;
+            const hasDiscount = item.product.discount === true;
             return (
-              <div key={i} className="col-md-3 p-2 col-lg-3 col-sm-6 col-12">
-                <div className="card shadow-sm h-100 rounded-3 bg-white">
-                  <img alt="" className="w-100 rounded-top-2" src={item.product.image} />
-                  <div className="card-body">
-                    <p className="bodySmal text-secondary my-1">{item.product.title}</p>
-                    {price}
-                    <Rating value={Number.parseFloat(item?.product.star ?? 0) || 0} readOnly size="medium" precision={0.5} />
+              <div key={i} className="col-md-4 col-lg-3 col-sm-6 col-12 mt-4 px-2">
+                <div
+                  className="card h-100 rounded-4 border-0 shadow-sm bg-white overflow-hidden product-card"
+                  style={{ transition: "all 0.3s ease", cursor: "pointer" }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-5px)";
+                    e.currentTarget.classList.replace("shadow-sm", "shadow");
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.classList.replace("shadow", "shadow-sm");
+                  }}
+                >
+                  <div className="position-relative">
+                    <img
+                      alt={item.product.title}
+                      className="w-100"
+                      src={item.product.image || "https://placehold.co/600x600/f8f9fa/adb5bd?text=Image+Not+Found"}
+                      style={{ aspectRatio: "1/1", objectFit: "cover" }}
+                    />
+                    {hasDiscount && (
+                      <span className="badge bg-danger position-absolute top-0 start-0 m-3 rounded-pill px-3 py-2 shadow-sm">Sale</span>
+                    )}
+                  </div>
 
-                    <p className="mt-3">
-                      <button
-                        onClick={async () => {
-                          await remove(item.productID);
-                        }}
-                        className="btn btn-outline-danger btn-sm"
-                      >
-                        Remove
-                      </button>
-                      <Link className="btn mx-2 btn-outline-success btn-sm" to={`/details/${item.productID}`}>
+                  <div className="card-body d-flex flex-column p-4">
+                    <h6 className="card-title text-dark fw-bold mb-2 text-truncate" title={item.product.title}>
+                      {item.product.title}
+                    </h6>
+
+                    <div className="d-flex align-items-center gap-1 text-warning mb-2">
+                      <i className="bi bi-star-fill small"></i>
+                      <span className="text-dark fw-bold small">{item.product.star || "0"}</span>
+                    </div>
+
+                    <div className="mb-3 mt-auto">
+                      {hasDiscount ? (
+                        <div className="d-flex align-items-center gap-2">
+                          <span className="h5 fw-bold text-success mb-0">${item.product.discountPrice}</span>
+                          <span className="text-muted text-decoration-line-through small">${item.product.price}</span>
+                        </div>
+                      ) : (
+                        <span className="h5 fw-bold text-dark mb-0">${item.product.price}</span>
+                      )}
+                    </div>
+
+                    <div className="d-flex gap-2 w-100 mt-2">
+                      <Link className="btn btn-outline-success flex-grow-1 rounded-3 py-2 fw-semibold" to={`/details/${item?.productID}`}>
                         Details
                       </Link>
-                    </p>
+                      <button
+                        onClick={() => remove(item?.productID)}
+                        className="btn btn-light text-danger border rounded-3 px-3 py-2"
+                        title="Remove from Wishlist"
+                      >
+                        <i className="bi bi-trash3"></i>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

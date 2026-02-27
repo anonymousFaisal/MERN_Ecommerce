@@ -1,10 +1,7 @@
 import React from "react";
-import useUserStore from "../../store/useUserStore";
 
 const UserSubmitButton = (props) => {
-  
-  let { isFormSubmit } = useUserStore();
-  if (isFormSubmit === false) {
+  if (props.submit === false || !props.submit) {
     return (
       <button onClick={props.onClick} type="submit" className={props.className}>
         {props.text}

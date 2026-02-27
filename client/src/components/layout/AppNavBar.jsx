@@ -1,18 +1,35 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import logo from "../../assets/images/plainb-logo.svg";
-import useProductStore from "../../store/useProductStore";
-import useUserStore from "../../store/useUserStore";
 import UserSubmitButton from "../user/UserSubmitButton";
-import useCartStore from "../../store/useCartStore";
-import useWishStore from "../../store/useWishStore";
+import { setAuthStatus } from "../../redux/features/userSlice";
+import { useUserLogoutMutation } from "../../redux/features/userApi";
+import { useGetCartListQuery } from "../../redux/features/cartApi";
+import { useGetWishListQuery } from "../../redux/features/wishApi";
+import { baseApi } from "../../redux/api/baseApi";
 
 const AppNavBar = () => {
   const navigate = useNavigate();
-  const { isLoggedIn, fetchUserLogout } = useUserStore();
-  const { searchQuery, setSearchQuery } = useProductStore();
-  const { cartCount, fetchCartList, resetCart } = useCartStore();
-  const { wishCount, fetchWishList, resetWish } = useWishStore();
+  const dispatch = useDispatch();
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const [userLogout, { isLoading: isLogoutLoading }] = useUserLogoutMutation();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  const { data: cartData } = useGetCartListQuery(undefined, { skip: !isLoggedIn });
+  const { data: wishData } = useGetWishListQuery(undefined, { skip: !isLoggedIn });
+
+  const cartCount = cartData?.length || 0;
+  const wishCount = wishData?.length || 0;
+
+  // Glassmorphism scroll effect
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -22,203 +39,116 @@ const AppNavBar = () => {
     } else {
       navigate("/");
     }
+    setMobileOpen(false);
   };
 
   const onLogOut = async () => {
-    await fetchUserLogout();
+    await userLogout();
     sessionStorage.clear();
     localStorage.clear();
-    resetCart();
-    resetWish();
+    dispatch(setAuthStatus(false));
+    dispatch(baseApi.util.resetApiState());
     navigate("/");
   };
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      fetchCartList().catch(() => {});
-      fetchWishList().catch(() => {});
-    } else {
-      resetCart();
-      resetWish();
-    }
-  }, [isLoggedIn, fetchCartList, resetCart, fetchWishList, resetWish]);
-
   return (
-    <>
-      {/* Top contact & social strip */}
-      <div className="bg-success text-white py-2">
-        <div className="container">
-          <div className="row align-items-center g-2">
-            <div className="col-12 col-md-6">
-              <div className="d-flex flex-wrap gap-3 small">
-                <a href="mailto:Support@PlanB.com" className="link-light text-decoration-none">
-                  <i className="bi bi-envelope me-1"></i> Support@PlanB.com
-                </a>
-                <a href="tel:01774688159" className="link-light text-decoration-none">
-                  <i className="bi bi-phone me-1"></i> 01774688159
-                </a>
-              </div>
-            </div>
-            <div className="col-12 col-md-6">
-              <div className="d-flex gap-3 justify-content-md-end small">
-                <a href="#" aria-label="WhatsApp" className="link-light">
-                  <i className="bi bi-whatsapp fs-5"></i>
-                </a>
-                <a href="#" aria-label="YouTube" className="link-light">
-                  <i className="bi bi-youtube fs-5"></i>
-                </a>
-                <a href="#" aria-label="Facebook" className="link-light">
-                  <i className="bi bi-facebook fs-5"></i>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main navbar */}
-      <nav className="navbar sticky-top navbar-expand-lg navbar-light bg-white py-3 shadow-sm">
-        <div className="container">
-          <Link className="navbar-brand d-flex align-items-center" to="/">
-            <img src={logo} alt="PlanB" width="96" className="img-fluid" />
+    <header className={`site-navbar ${scrolled ? "scrolled" : ""}`}>
+      <div className="container">
+        <div className="navbar-inner">
+          {/* Logo */}
+          <Link to="/" className="nav-logo">
+            <img src={logo} alt="PlanB" />
           </Link>
 
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#nav06"
-            aria-controls="nav06"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
+          {/* Mobile hamburger */}
+          <button className="nav-mobile-toggle" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Toggle navigation">
+            <i className={`bi ${mobileOpen ? "bi-x-lg" : "bi-list"}`}></i>
           </button>
 
-          <div className="collapse navbar-collapse" id="nav06">
-            {/* Left nav links */}
-            <ul className="navbar-nav ms-lg-3 me-auto my-3 my-lg-0 d-flex flex-row gap-2">
-              <li className="nav-item">
-                <NavLink
-                  to="/"
-                  end
-                  className={({ isActive }) =>
-                    `btn border rounded-3 d-inline-flex align-items-center px-3 py-2 ${isActive ? "btn-success text-white" : "btn-light text-dark"}`
-                  }
-                >
-                  <i className="bi bi-house-door me-2"></i>
-                  <span className="fw-semibold">Home</span>
+          {/* Collapsible area */}
+          <div className={`nav-collapse ${mobileOpen ? "open" : ""}`}>
+            {/* Nav Links */}
+            <ul className="nav-links">
+              <li>
+                <NavLink to="/" end className={({ isActive }) => `nav-link-item ${isActive ? "active" : ""}`} onClick={() => setMobileOpen(false)}>
+                  <i className="bi bi-house-door"></i>
+                  Home
                 </NavLink>
               </li>
-
-              <li className="nav-item">
-                <NavLink
-                  to="/cart"
-                  aria-label="Cart"
-                  className={({ isActive }) =>
-                    `btn position-relative d-inline-flex align-items-center rounded-3 px-3 py-2 ${
-                      isActive ? "btn-success text-white" : "btn-light text-dark border"
-                    }`
-                  }
-                >
-                  <i className="bi bi-bag me-2"></i>
-                  Cart
-                  {cartCount > 0 && (
-                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
-                      {cartCount}
-                      <span className="visually-hidden">items in cart</span>
-                    </span>
-                  )}
-                </NavLink>
-              </li>
-
-              <li className="nav-item">
-                <NavLink
-                  to="/wish"
-                  aria-label="Wishlist"
-                  className={({ isActive }) =>
-                    `btn position-relative d-inline-flex align-items-center rounded-3 px-3 py-2 ${
-                      isActive ? "btn-success text-white" : "btn-light text-dark border"
-                    }`
-                  }
-                >
-                  <i className="bi bi-heart me-2"></i>
-                  Wish
-                  {wishCount > 0 && (
-                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                      {wishCount}
-                      <span className="visually-hidden">items in wishlist</span>
-                    </span>
-                  )}
-                </NavLink>
-              </li>
-              <li className="nav-item">
-                <NavLink
-                  to="/order"
-                  aria-label="Orders"
-                  className={({ isActive }) =>
-                    `btn position-relative d-inline-flex align-items-center rounded-3 px-3 py-2 ${
-                      isActive ? "btn-success text-white" : "btn-light text-dark border"
-                    }`
-                  }
-                >
-                  <i className="bi bi-box-seam me-2"></i>
+              <li>
+                <NavLink to="/order" className={({ isActive }) => `nav-link-item ${isActive ? "active" : ""}`} onClick={() => setMobileOpen(false)}>
+                  <i className="bi bi-box-seam"></i>
                   Orders
                 </NavLink>
               </li>
             </ul>
 
-            {/* Search + actions */}
-            <div className="d-flex align-items-center gap-2">
-              <form className="input-group" role="search" onSubmit={onSubmit}>
-                <input
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="form-control"
-                  type="search"
-                  placeholder="Search products..."
-                />
-                <button className="btn btn-outline-dark" type="submit" aria-label="Search">
-                  <i className="bi bi-search"></i>
-                </button>
+            {/* Right side actions */}
+            <div className="nav-actions">
+              {/* Search */}
+              <form className="nav-search" role="search" onSubmit={onSubmit}>
+                <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} type="search" placeholder="Search products..." />
+                <i className="bi bi-search nav-search-icon"></i>
               </form>
 
+              {/* Icon group: Cart & Wishlist */}
+              <div className="nav-icon-group" style={{ display: "flex", gap: "4px", alignItems: "center" }}>
+                <NavLink
+                  to="/cart"
+                  className={({ isActive }) => `nav-icon-link ${isActive ? "active" : ""}`}
+                  aria-label="Cart"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <i className="bi bi-bag"></i>
+                  {cartCount > 0 && (
+                    <span className="nav-badge" key={cartCount}>
+                      {cartCount}
+                    </span>
+                  )}
+                </NavLink>
+
+                <NavLink
+                  to="/wish"
+                  className={({ isActive }) => `nav-icon-link ${isActive ? "active" : ""}`}
+                  aria-label="Wishlist"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <i className="bi bi-heart"></i>
+                  {wishCount > 0 && (
+                    <span className="nav-badge" key={wishCount}>
+                      {wishCount}
+                    </span>
+                  )}
+                </NavLink>
+              </div>
+
+              {/* Divider */}
+              <span className="nav-divider d-none d-lg-block"></span>
+
+              {/* Auth area */}
               {isLoggedIn ? (
                 <>
                   <NavLink
                     to="/profile"
-                    className={({ isActive }) =>
-                      `btn d-inline-flex align-items-center rounded-3 px-3 py-2 ${isActive ? "btn-success text-white" : "btn-light text-dark border"}`
-                    }
+                    className={({ isActive }) => `nav-profile-link ${isActive ? "active" : ""}`}
+                    onClick={() => setMobileOpen(false)}
                   >
-                    <i className="bi bi-person-circle me-2"></i>
+                    <i className="bi bi-person-circle"></i>
                     Profile
                   </NavLink>
-
-                  <UserSubmitButton
-                    onClick={onLogOut}
-                    text="Logout"
-                    className="btn btn-outline-dark rounded-3 d-inline-flex align-items-center px-3 py-2"
-                  />
+                  <UserSubmitButton submit={isLogoutLoading} onClick={onLogOut} text="Logout" className="nav-auth-btn" />
                 </>
               ) : (
-                <>
-                  <NavLink
-                    to="/login"
-                    className={({ isActive }) =>
-                      `btn d-inline-flex align-items-center rounded-3 px-3 py-2 ${isActive ? "btn-success text-white" : "btn-light text-dark border"}`
-                    }
-                  >
-                    <i className="bi bi-box-arrow-in-right me-2"></i>
-                    Login
-                  </NavLink>
-                </>
+                <NavLink to="/login" className="nav-auth-btn filled" onClick={() => setMobileOpen(false)}>
+                  <i className="bi bi-box-arrow-in-right"></i>
+                  Login
+                </NavLink>
               )}
             </div>
           </div>
         </div>
-      </nav>
-    </>
+      </div>
+    </header>
   );
 };
 

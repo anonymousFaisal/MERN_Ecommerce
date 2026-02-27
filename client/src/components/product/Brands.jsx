@@ -1,38 +1,68 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import useProductStore from "../../store/useProductStore";
+import { useGetBrandListQuery } from "../../redux/features/productApi";
 import BrandsSkeleton from "./../../skeleton/BrandsSkeleton";
 
 const Brands = () => {
-  const { brandList } = useProductStore();
+  const { data: brandList, isLoading } = useGetBrandListQuery();
 
-  if (brandList === null) {
+  if (isLoading || !brandList) {
     return <BrandsSkeleton />;
   } else {
     return (
-      <div className="section">
+      <section className="brands-section py-5 my-5 bg-white">
         <div className="container">
-          <div className="row">
-            <h1 className="headline-5 text-center my-2 p-0">Top Brands</h1>
-            <span className="bodyMedium mb-5 text-center">
-              Explore a World of Choices Across Our Most Popular <br />
-              Shopping Categories{" "}
-            </span>
+          <div className="text-center mb-5">
+            <h2 className="display-6 fw-bold mb-3 text-dark">Top Brands</h2>
+            <p className="bodyLarge text-muted mx-auto" style={{ maxWidth: "600px" }}>
+              Explore Our Curated Selection of Premium Partners
+            </p>
+          </div>
+          <div className="row justify-content-center g-4 stagger-children">
             {brandList.map((item, index) => (
-              <div key={index} className="col-6 col-lg-8r text-center col-md-8r p-2">
-                <Link to={`/by-brand/${item._id}`} className="card h-100 rounded-3 bg-white">
-                  <div className="card-body d-flex flex-column align-items-center justify-content-between">
-                    <div className="d-flex flex-grow-1 align-items-center justify-content-center">
-                      <img alt={item.brandName} className="w-75" src={item.brandImg} />
-                    </div>
-                    <p className="bodySmal mt-3 mb-0">{item.brandName}</p>
+              <div key={index} className="col-6 col-sm-4 col-md-3 col-lg-2 animate-fade-in-up">
+                <Link
+                  to={`/by-brand/${item._id}`}
+                  className="card h-100 border-0 bg-light text-decoration-none d-flex flex-column align-items-center justify-content-center p-4 group"
+                  style={{ transition: "background-color 0.3s ease, border-radius 0.3s ease", borderRadius: "1rem" }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "var(--themeColorVeryLight)";
+                    const img = e.currentTarget.querySelector("img");
+                    if (img) {
+                      img.style.filter = "grayscale(0%)";
+                      img.style.transform = "scale(1.1)";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "var(--bgLight)";
+                    const img = e.currentTarget.querySelector("img");
+                    if (img) {
+                      img.style.filter = "grayscale(100%)";
+                      img.style.transform = "scale(1)";
+                    }
+                  }}
+                >
+                  <div className="d-flex align-items-center justify-content-center mb-3" style={{ height: "80px", width: "100%" }}>
+                    <img
+                      alt={item.brandName}
+                      className="img-fluid"
+                      src={item.brandImg}
+                      style={{
+                        maxHeight: "100%",
+                        maxWidth: "100%",
+                        objectFit: "contain",
+                        filter: "grayscale(100%)",
+                        transition: "all 0.4s ease",
+                      }}
+                    />
                   </div>
+                  <p className="bodyMedium fw-semibold text-dark mb-0 text-center text-truncate w-100">{item.brandName}</p>
                 </Link>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </section>
     );
   }
 };

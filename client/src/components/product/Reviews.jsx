@@ -1,9 +1,19 @@
 import React from "react";
-import useProductStore from "../../store/useProductStore";
+import { useParams } from "react-router-dom";
 import Rating from "@mui/material/Rating";
+import { useGetProductReviewListQuery } from "../../redux/features/productApi";
 
 const Reviews = () => {
-  const { reviewList } = useProductStore();
+  const { productID } = useParams();
+  const { data: reviewList, isFetching } = useGetProductReviewListQuery(productID);
+
+  if (isFetching) {
+    return (
+      <div className="text-center py-4">
+        <span className="spinner-border"></span>
+      </div>
+    );
+  }
 
   if (!Array.isArray(reviewList) || reviewList.length === 0) {
     return (
@@ -30,12 +40,7 @@ const Reviews = () => {
 
                 <div className="flex-grow-1">
                   <h6 className="mb-1">{name}</h6>
-                  <Rating
-                    value={rating}
-                    readOnly
-                    size="medium"
-                    precision={0.5}
-                  />
+                  <Rating value={rating} readOnly size="medium" precision={0.5} />
                   {des && <p className="mb-0 mt-2 text-muted">{des}</p>}
                 </div>
               </div>
