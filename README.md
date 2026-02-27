@@ -25,6 +25,38 @@ This application recently underwent a massive **12-Phase UI & UX Overhaul**, tra
 
 ---
 
+## 📸 Visual Tour & Screenshots
+
+Check out some of the beautifully overhauled UI interfaces.
+
+> **How to update these screenshots:**
+>
+> 1. Take screenshots of your running application.
+> 2. Save them inside an `images/` folder in the root or just drag and drop the image file directly into github's markdown editor when editing this README.
+> 3. Replace the placeholder comment `<!-- url -->` inside the parenthesis below with the generated URL or relative path (e.g., `![Home Page](./images/home_screenshot.png)`).
+
+### Home Page & Sliders
+
+![Home Page Overview](<!-- url -->)
+
+### Product Details & Rich Descriptions
+
+![Product Details View](<!-- url -->)
+
+### Smart Filtering & Search Results
+
+![Search and Filtering](<!-- url -->)
+
+### User Authentication (OTP Flow)
+
+![OTP Login Flow](<!-- url -->)
+
+### Cart & Checkout System
+
+![Cart Summary View](<!-- url -->)
+
+---
+
 ## 🧰 Tech Stack
 
 **Frontend Interface:**
