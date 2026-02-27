@@ -41,6 +41,13 @@ const Details = () => {
   const [createWishItem, { isLoading: isWishAdding }] = useCreateWishItemMutation();
 
   const addToCart = async (productID) => {
+    if (details?.details?.color && !cartForm.color) {
+      return toast.error("Please select a Color");
+    }
+    if (details?.details?.size && !cartForm.size) {
+      return toast.error("Please select a Size");
+    }
+
     try {
       const res = await createCartItem({ ...cartForm, productID }).unwrap();
       if (res?.status === "success") {
