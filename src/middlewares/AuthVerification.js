@@ -14,7 +14,7 @@ module.exports = function auth(req, res, next) {
   }
 
   try {
-    const decoded = DecodeToken(token); // throws on bad/expired
+    const decoded = DecodeToken(token);
 
     const userId = decoded.userID ?? decoded.user_id ?? decoded.sub;
     if (!userId) {

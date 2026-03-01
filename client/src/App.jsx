@@ -19,6 +19,9 @@ import WishPage from "./pages/WishPage";
 import CartPage from "./pages/CartPage";
 import OrderPage from "./pages/OrderPage";
 import InvoicePage from "./pages/InvoicePage";
+import PaymentSuccessPage from "./pages/PaymentSuccessPage";
+import PaymentFailPage from "./pages/PaymentFailPage";
+import PaymentCancelPage from "./pages/PaymentCancelPage";
 
 // Main App component
 
@@ -56,6 +59,11 @@ const App = () => {
         {/* Order Page /> */}
         <Route path="/order" element={<OrderPage />} />
         <Route path="/invoice/:invoiceID" element={<InvoicePage />} />
+
+        {/* Payment Pages */}
+        <Route path="/payment/success/:trxID" element={<PaymentSuccessPage />} />
+        <Route path="/payment/fail/:trxID" element={<PaymentFailPage />} />
+        <Route path="/payment/cancel/:trxID" element={<PaymentCancelPage />} />
       </Routes>
     </BrowserRouter>
   );

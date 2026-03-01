@@ -8,6 +8,7 @@ const {
   InvoiceProductListService,
 } = require("../services/InvoiceServices");
 const asyncHandler = require("../utility/asyncHandler");
+const config = require("../config/config");
 
 exports.CreateInvoice = asyncHandler(async (req, res) => {
   const user_ID = req.user?.id;
@@ -21,24 +22,21 @@ exports.CreateInvoice = asyncHandler(async (req, res) => {
 });
 
 exports.PaymentSuccess = asyncHandler(async (req, res) => {
-  trxID = req.params.trxID;
-  const result = await PaymentSuccessService(trxID);
-  const code = result.status === "success" ? 200 : 400;
-  return res.status(code).json(result);
+  let trxID = req.params.trxID;
+  await PaymentSuccessService(trxID);
+  return res.redirect(`${config.corsOrigin}/payment/success/${trxID}`);
 });
 
 exports.PaymentFail = asyncHandler(async (req, res) => {
-  trxID = req.params.trxID;
-  const result = await PaymentFailService(trxID);
-  const code = result.status === "success" ? 200 : 400;
-  return res.status(code).json(result);
+  let trxID = req.params.trxID;
+  await PaymentFailService(trxID);
+  return res.redirect(`${config.corsOrigin}/payment/fail/${trxID}`);
 });
 
 exports.PaymentCancel = asyncHandler(async (req, res) => {
-  trxID = req.params.trxID;
-  const result = await PaymentCancelService(trxID);
-  const code = result.status === "success" ? 200 : 400;
-  return res.status(code).json(result);
+  let trxID = req.params.trxID;
+  await PaymentCancelService(trxID);
+  return res.redirect(`${config.corsOrigin}/payment/cancel/${trxID}`);
 });
 
 exports.PaymentIPN = asyncHandler(async (req, res) => {
